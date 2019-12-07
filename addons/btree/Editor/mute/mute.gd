@@ -1,0 +1,27 @@
+tool
+extends GraphNode
+
+const type = 7
+
+func _enter_tree():
+	title = name
+	return
+
+func get_data():
+	return {
+		"size" : rect_size,
+		"offset" : offset
+	}
+
+func set_data(data):
+	rect_size = data.size
+	offset = data.offset
+	return
+
+func _on_mute_resize_request(new_minsize):
+	rect_size = new_minsize
+	return
+
+func _on_mute_close_request():
+	get_parent().child_delete(self)
+	return
