@@ -1,0 +1,52 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://addons/btree/Editor/test.gd" type="Script" id=1]
+[ext_resource path="res://addons/btree/Editor/TreeEditor.tscn" type="PackedScene" id=2]
+
+[node name="Control" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 1 )
+
+[node name="TreeEditor" parent="." instance=ExtResource( 2 )]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 0
+custom_colors/font_color = Color( 1, 0, 0, 1 )
+text = "No BTREE node is selected"
+align = 1
+valign = 1
+
+[node name="hint" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
+mouse_filter = 2
+alignment = 2
+
+[node name="help" type="VBoxContainer" parent="."]
+editor/display_folded = true
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="help"]
+margin_top = 90.0
+margin_right = 480.0
+margin_bottom = 189.0
+text = "Control + F = Focus to selected node
+Control + S = Save
+Control + Shift + Mouse Scroll = Zoom In/Out
+(Select a node) and Control + Shift + C = Duplicate Recursive
+(Select a node) and Control + Shift + X = Delete Recursive
+(Select a node) and Control + Shift + Space = Move Recursive"
+align = 1
+valign = 1

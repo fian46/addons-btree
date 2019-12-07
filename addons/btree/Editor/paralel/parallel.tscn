@@ -1,0 +1,41 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://addons/btree/Editor/paralel/parallel.gd" type="Script" id=1]
+
+[node name="parallel" type="GraphNode"]
+margin_right = 32.0
+margin_bottom = 29.0
+hint_tooltip = "running the child in paralel, succeed when all child is succeed, failed when any of child is failed"
+title = "parallel"
+show_close = true
+resizable = true
+slot/0/left_enabled = true
+slot/0/left_type = 0
+slot/0/left_color = Color( 0, 0.109804, 1, 1 )
+slot/0/right_enabled = false
+slot/0/right_type = 0
+slot/0/right_color = Color( 1, 1, 1, 1 )
+script = ExtResource( 1 )
+
+[node name="slot0" type="HBoxContainer" parent="."]
+margin_left = 16.0
+margin_top = 24.0
+margin_right = 76.0
+margin_bottom = 44.0
+alignment = 2
+
+[node name="Add" type="Button" parent="slot0"]
+margin_left = 19.0
+margin_right = 39.0
+margin_bottom = 20.0
+text = "+"
+
+[node name="Del" type="Button" parent="slot0"]
+margin_left = 43.0
+margin_right = 60.0
+margin_bottom = 20.0
+text = "-"
+[connection signal="close_request" from="." to="." method="_on_parallel_close_request"]
+[connection signal="resize_request" from="." to="." method="_on_parallel_resize_request"]
+[connection signal="pressed" from="slot0/Add" to="." method="_on_Add_pressed"]
+[connection signal="pressed" from="slot0/Del" to="." method="_on_Del_pressed"]
