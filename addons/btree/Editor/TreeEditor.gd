@@ -52,6 +52,8 @@ var repeat_scene = preload("res://addons/btree/Editor/repeat/repeat.tscn")
 var while_node_scene = preload("res://addons/btree/Editor/while_node/while_node.tscn")
 var wait_scene = preload("res://addons/btree/Editor/wait_node/wait_node.tscn")
 var race_scene = preload("res://addons/btree/Editor/race/race.tscn")
+var random_selector_scene = preload("res://addons/btree/Editor/random_selector/random_selector.tscn")
+var random_sequence_scene = preload("res://addons/btree/Editor/random_sequence/random_sequence.tscn")
 
 func build_tree_from_data():
 	if  not data:
@@ -130,9 +132,21 @@ func create_node(n):
 		r.name = n.name
 		r.set_data(n.data)
 		return r
+	elif  n.type == 12:
+		var r = random_selector_scene.instance()
+		r.name = n.name
+		r.set_data(n.data)
+		return r
+	elif  n.type == 13:
+		var r = random_sequence_scene.instance()
+		r.name = r.name
+		r.set_data(n.data)
+		return r
 	return null
 
 func _on_TreeEditor_connection_request(from, from_slot, to, to_slot):
+	if  from == to:
+		return
 	for i in get_connection_list():
 		if  from == i.from and from_slot == i.from_port:
 			disconnect_node(i.from, i.from_port, i.to, i.to_port)
@@ -290,9 +304,6 @@ func copy_node():
 	build_tree(cp, get_connection_list(), nodes)
 	nodes.clear()
 	rec_populate(cp, nodes)
-	
-	for i in nodes:
-		print(i)
 	
 	var inst_node = []
 	var mapping = {}
