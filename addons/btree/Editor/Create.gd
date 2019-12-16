@@ -14,6 +14,8 @@ var repeat_scene = preload("res://addons/btree/Editor/repeat/repeat.tscn")
 var while_node_scene = preload("res://addons/btree/Editor/while_node/while_node.tscn")
 var wait_scene = preload("res://addons/btree/Editor/wait_node/wait_node.tscn")
 var race_scene = preload("res://addons/btree/Editor/race/race.tscn")
+var random_selector_scene = preload("res://addons/btree/Editor/random_selector/random_selector.tscn")
+var random_sequence_scene = preload("res://addons/btree/Editor/random_sequence/random_sequence.tscn")
 
 var pop_pos = Vector2.ZERO
 
@@ -43,6 +45,10 @@ func id_pressed(id):
 			inst = wait_scene.instance()
 		10:
 			inst = race_scene.instance()
+		11:
+			inst = random_selector_scene.instance()
+		12:
+			inst = random_sequence_scene.instance()
 	inst.offset = (get_parent().get_parent().scroll_offset / zoom) + (get_parent().get_parent().get_local_mouse_position() / zoom)
 	get_parent().get_parent().add_child(inst)
 	return
@@ -62,4 +68,6 @@ func _ready():
 	pop.add_item("WhileNode")
 	pop.add_item("WaitNode")
 	pop.add_item("RaceNode")
+	pop.add_item("RandomSelector")
+	pop.add_item("RandomSequenc")
 	return

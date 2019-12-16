@@ -223,6 +223,35 @@ class Sequence extends TNode:
 		status.succeed()
 		return status.status
 
+class RandomSequence extends TNode:
+	var current_child = 0
+	
+	func reset():
+		status.reset()
+		current_child = 0
+		for i in range(get_child_count()):
+			get_child(i).reset()
+		children.shuffle()
+		return
+	
+	func tick()->int:
+		if  status.status != status.RUNNING:
+			return status.status
+		if  get_child_count() == 0:
+			status.succeed()
+			return status.status
+		for i in range(current_child, get_child_count()):
+			current_child = i
+			var c = get_child(i)
+			var r = c.tick()
+			if  r == Status.RUNNING:
+				return status.status
+			elif r == Status.FAILED:
+				status.failed()
+				return status.status
+		status.succeed()
+		return status.status
+
 class Selector extends TNode:
 	var current_child = 0
 	
@@ -231,6 +260,35 @@ class Selector extends TNode:
 		current_child = 0
 		for i in range(get_child_count()):
 			get_child(i).reset()
+		return
+	
+	func tick()->int:
+		if  status.status != Status.RUNNING:
+			return status.status
+		if  get_child_count() == 0:
+			status.succeed()
+			return status.status
+		for i in range(current_child, get_child_count()):
+			current_child = i
+			var c = get_child(i)
+			var r = c.tick()
+			if  r == Status.RUNNING:
+				return status.status
+			elif r == 1:
+				status.succeed()
+				return status.status
+		status.failed()
+		return status.status
+
+class RandomSelector extends TNode:
+	var current_child = 0
+	
+	func reset():
+		status.reset()
+		current_child = 0
+		for i in range(get_child_count()):
+			get_child(i).reset()
+		children.shuffle()
 		return
 	
 	func tick()->int:
@@ -387,6 +445,10 @@ static func create_runtime(data:Dictionary, target) -> TNode:
 		current.tick_count = current.count
 	elif data.type == 11:
 		current = Race.new()
+	elif data.type == 12:
+		current = RandomSelector.new()
+	elif data.type == 13:
+		current = RandomSequence.new()
 	if  current:
 		for child in data.child:
 			current.children.append(create_runtime(child, target))
