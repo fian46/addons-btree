@@ -36,7 +36,6 @@ text = "Count : "
 margin_left = 53.0
 margin_right = 127.0
 margin_bottom = 24.0
-max_value = 1.0
 allow_greater = true
 script = ExtResource( 2 )
 [connection signal="close_request" from="." to="." method="_on_repeat_close_request"]

@@ -24,7 +24,6 @@ func clear_data():
 	root_object = null
 	return
 
-
 func load_data(ndata, ncontrol):
 	data = ndata
 	control = ncontrol
@@ -41,19 +40,13 @@ func clear_editor():
 			i.queue_free()
 	return
 
-var task_scene = preload("res://addons/btree/Editor/task/task.tscn")
-var sequence_scene = preload("res://addons/btree/Editor/sequence/sequence.tscn")
-var selector_scene = preload("res://addons/btree/Editor/selector/selector.tscn")
 var pselector_scene = preload("res://addons/btree/Editor/pselector/pselector.tscn")
-var priority_condition = preload("res://addons/btree/Editor/pselector/priority_condition.tscn")
-var paralel_scene = preload("res://addons/btree/Editor/paralel/parallel.tscn")
 var mute_scene = preload("res://addons/btree/Editor/mute/mute.tscn")
 var repeat_scene = preload("res://addons/btree/Editor/repeat/repeat.tscn")
-var while_node_scene = preload("res://addons/btree/Editor/while_node/while_node.tscn")
 var wait_scene = preload("res://addons/btree/Editor/wait_node/wait_node.tscn")
-var race_scene = preload("res://addons/btree/Editor/race/race.tscn")
-var random_selector_scene = preload("res://addons/btree/Editor/random_selector/random_selector.tscn")
-var random_sequence_scene = preload("res://addons/btree/Editor/random_sequence/random_sequence.tscn")
+var general_fcall_scene = preload("res://addons/btree/Editor/general_fcall/general_fcall.tscn")
+var general_decorator_scene = preload("res://addons/btree/Editor/general_decorator/general_decorator.tscn")
+var general_fcall_class = preload("res://addons/btree/Editor/general_fcall/general_fcall.gd")
 
 func build_tree_from_data():
 	if  not data:
@@ -78,17 +71,20 @@ func build_tree_from_data():
 
 func create_node(n):
 	if  n.type == 1:
-		var task = task_scene.instance()
+		var task = general_fcall_scene.instance()
+		task.as_task()
 		task.name = n.name
 		task.set_data(n.data)
 		return task
 	elif n.type == 2:
-		var seq = sequence_scene.instance()
+		var seq = general_decorator_scene.instance()
+		seq.as_sequence()
 		seq.name = n.name
 		seq.set_data(n.data)
 		return seq
 	elif n.type == 3:
-		var sel = selector_scene.instance()
+		var sel = general_decorator_scene.instance()
+		sel.as_selector()
 		sel.name = n.name
 		sel.set_data(n.data)
 		return sel
@@ -98,12 +94,14 @@ func create_node(n):
 		pse.set_data(n.data)
 		return pse
 	elif n.type == 5:
-		var pc = priority_condition.instance()
-		pc.name = n.name
-		pc.set_data(n.data)
-		return pc
+		var inst = general_fcall_scene.instance()
+		inst.as_priority_condition()
+		inst.name = n.name
+		inst.set_data(n.data)
+		return inst
 	elif n.type == 6:
-		var par = paralel_scene.instance()
+		var par = general_decorator_scene.instance()
+		par.as_paralel()
 		par.name = n.name
 		par.set_data(n.data)
 		return par
@@ -118,7 +116,8 @@ func create_node(n):
 		rep.set_data(n.data)
 		return rep
 	elif n.type == 9:
-		var whi = while_node_scene.instance()
+		var whi = general_fcall_scene.instance()
+		whi.as_while()
 		whi.name = n.name
 		whi.set_data(n.data)
 		return whi
@@ -128,17 +127,20 @@ func create_node(n):
 		w.set_data(n.data)
 		return w
 	elif n.type == 11:
-		var r = race_scene.instance()
+		var r = general_decorator_scene.instance()
+		r.as_race()
 		r.name = n.name
 		r.set_data(n.data)
 		return r
 	elif  n.type == 12:
-		var r = random_selector_scene.instance()
+		var r = general_decorator_scene.instance()
+		r.as_random_selector()
 		r.name = n.name
 		r.set_data(n.data)
 		return r
 	elif  n.type == 13:
-		var r = random_sequence_scene.instance()
+		var r = general_decorator_scene.instance()
+		r.as_random_sequence()
 		r.name = r.name
 		r.set_data(n.data)
 		return r
@@ -168,7 +170,7 @@ func _on_save_pressed():
 	if  not data:
 		get_parent().hint("No BTREE selected !")
 		return
-	get_parent().hint("SAVING CHANGES")
+	get_parent().hint("Saving Data")
 	data.tree = {}
 	var info = data.tree
 	info.nodes = []
@@ -435,8 +437,15 @@ func _on_search_bar_text_changed(new_text):
 		if  i is GraphNode:
 			if  most_similar == null:
 				most_similar = i
-			elif most_similar.name.similarity(new_text) < i.name.similarity(new_text) :
-				most_similar = i
+			else:
+				var itoken = i.name
+				var mtoken = most_similar.name
+				if  i is general_fcall_class:
+					itoken = i.search_token()
+				if  most_similar is general_fcall_class:
+					mtoken = most_similar.search_token()
+				if  mtoken.similarity(new_text) < itoken.similarity(new_text): 
+					most_similar = i
 	if  most_similar:
 		scroll_offset = most_similar.offset * zoom - ((rect_size / 2) - (most_similar.rect_size / 2))
 	return

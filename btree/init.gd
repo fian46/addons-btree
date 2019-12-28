@@ -3,6 +3,7 @@ extends EditorPlugin
 
 var btree = load("res://addons/btree/script/btree.gd")
 var ibtree = load("res://addons/btree/icons/icon_tree.svg")
+var topi = load("res://addons/btree/icons/icon_tree_top.svg")
 var dock_scene = preload("res://addons/btree/Editor/test.tscn")
 var dock
 
@@ -43,6 +44,9 @@ func make_visible(visible):
 		dock.get_node("TreeEditor").reload()
 		dock.hide()
 	return
+
+func get_plugin_icon():
+	return topi
 
 func has_main_screen():
 	return true

@@ -23,22 +23,22 @@ margin_bottom = 20.0
 alignment = 2
 
 [node name="Create" type="MenuButton" parent="group"]
-margin_left = 312.0
-margin_right = 365.0
+margin_left = 472.0
+margin_right = 525.0
 margin_bottom = 20.0
 text = "Create"
-items = [ "Task", null, 0, false, false, -1, 0, null, "", false, "Selector", null, 0, false, false, -1, 0, null, "", false, "Sequence", null, 0, false, false, -1, 0, null, "", false, "Priority Selector", null, 0, false, false, -1, 0, null, "", false, "Priority Condition", null, 0, false, false, -1, 0, null, "", false, "Paralel", null, 0, false, false, -1, 0, null, "", false, "Mute", null, 0, false, false, -1, 0, null, "", false, "Repeat", null, 0, false, false, -1, 0, null, "", false, "WhileNode", null, 0, false, false, -1, 0, null, "", false, "WaitNode", null, 0, false, false, -1, 0, null, "", false, "RaceNode", null, 0, false, false, -1, 0, null, "", false ]
+items = [ "Task", null, 0, false, false, -1, 0, null, "", false, "Selector", null, 0, false, false, -1, 0, null, "", false, "Sequence", null, 0, false, false, -1, 0, null, "", false, "Priority Selector", null, 0, false, false, -1, 0, null, "", false, "Priority Condition", null, 0, false, false, -1, 0, null, "", false, "Paralel", null, 0, false, false, -1, 0, null, "", false, "Mute", null, 0, false, false, -1, 0, null, "", false, "Repeat", null, 0, false, false, -1, 0, null, "", false, "WhileNode", null, 0, false, false, -1, 0, null, "", false, "WaitNode", null, 0, false, false, -1, 0, null, "", false, "RaceNode", null, 0, false, false, -1, 0, null, "", false, "RandomSelector", null, 0, false, false, -1, 0, null, "", false, "RandomSequenc", null, 0, false, false, -1, 0, null, "", false ]
 script = ExtResource( 2 )
 
 [node name="save" type="Button" parent="group"]
-margin_left = 369.0
-margin_right = 410.0
+margin_left = 529.0
+margin_right = 570.0
 margin_bottom = 20.0
 text = "Save"
 
 [node name="help" type="Button" parent="group"]
-margin_left = 414.0
-margin_right = 456.0
+margin_left = 574.0
+margin_right = 616.0
 margin_bottom = 20.0
 toggle_mode = true
 text = "Help"
