@@ -39,9 +39,6 @@ class TNode:
 	func get_child(idx):
 		return children[idx]
 	
-	func validate_tree(target):
-		return
-	
 	func reset():
 		return
 	
@@ -162,8 +159,8 @@ class PCondition extends TNode:
 	
 	func reset():
 		status.reset()
-		for i in range(get_child_count()):
-			get_child(i).reset()
+		if  get_child_count() == 1:
+			get_child(0).reset()
 		return
 	
 	func tick()->int:
@@ -175,10 +172,19 @@ class PCondition extends TNode:
 
 class Root extends TNode:
 	func reset():
-		get_child(0).reset()
+		status.reset()
+		if  get_child_count() == 1:
+			get_child(0).reset()
 		return
 	
 	func tick()->int:
+		if  status.status != Status.RUNNING:
+			return status.status
+		
+		if  get_child_count() == 0:
+			status.failed()
+			return status.status
+		
 		return get_child(0).tick()
 
 class Task extends TNode:
@@ -313,8 +319,8 @@ class Mute extends TNode:
 	
 	func reset():
 		status.reset()
-		for i in range(get_child_count()):
-			get_child(i).reset()
+		if  get_child_count() == 1:
+			get_child(0).reset()
 		return
 	
 	func tick()->int:
@@ -369,8 +375,8 @@ class WhileNode extends TNode:
 	
 	func reset():
 		status.reset()
-		for i in range(get_child_count()):
-			get_child(i).reset()
+		if  get_child_count() == 1:
+			get_child(0).reset()
 		return
 	
 	func tick() -> int:
@@ -416,7 +422,10 @@ static func create_runtime(data:Dictionary, target) -> TNode:
 		current = Task.new()
 		current.target = target
 		current.func_name = data.data.fn
-		current.status.params = data.data.values
+		if  data.data.has("values"):
+			current.status.params = data.data.values
+		else:
+			current.status.params = []
 	elif  data.type == 2:
 		current = Sequence.new()
 	elif  data.type == 3:
@@ -427,6 +436,10 @@ static func create_runtime(data:Dictionary, target) -> TNode:
 		current = PCondition.new()
 		current.target = target
 		current.func_name = data.data.fn
+		if  data.data.has("values"):
+			current.status.params = data.data.values
+		else:
+			current.status.params = []
 	elif data.type == 6:
 		current = Paralel.new()
 	elif data.type == 7:
@@ -439,6 +452,10 @@ static func create_runtime(data:Dictionary, target) -> TNode:
 		current = WhileNode.new()
 		current.func_name = data.data.fn
 		current.target = target
+		if  data.data.has("values"):
+			current.status.params = data.data.values
+		else:
+			current.status.params = []
 	elif data.type == 10:
 		current = WaitNode.new()
 		current.count = data.data.count
