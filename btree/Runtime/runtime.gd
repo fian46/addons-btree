@@ -280,7 +280,7 @@ class Selector extends TNode:
 			var r = c.tick()
 			if  r == Status.RUNNING:
 				return status.status
-			elif r == 1:
+			elif r == Status.SUCCEED:
 				status.succeed()
 				return status.status
 		status.failed()
@@ -309,7 +309,7 @@ class RandomSelector extends TNode:
 			var r = c.tick()
 			if  r == Status.RUNNING:
 				return status.status
-			elif r == 1:
+			elif r == Status.SUCCEED:
 				status.succeed()
 				return status.status
 		status.failed()
@@ -466,7 +466,11 @@ static func create_runtime(data:Dictionary, target) -> TNode:
 		current = RandomSelector.new()
 	elif data.type == 13:
 		current = RandomSequence.new()
+	elif data.type == 99:
+		current = create_runtime(data.data.data.root, target)
 	if  current:
 		for child in data.child:
-			current.children.append(create_runtime(child, target))
+			var tnode = create_runtime(child, target)
+			if  tnode:
+				current.children.append(tnode)
 	return current
