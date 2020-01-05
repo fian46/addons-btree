@@ -51,7 +51,6 @@ func id_pressed(id):
 		12:
 			inst = general_decorator_scene.instance()
 			inst.as_random_sequence()
-	
 	inst.offset = (get_parent().get_parent().scroll_offset / zoom) + (get_parent().get_parent().get_local_mouse_position() / zoom)
 	get_parent().get_parent().add_child(inst)
 	return
