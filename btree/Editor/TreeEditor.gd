@@ -48,6 +48,7 @@ var general_fcall_scene = preload("res://addons/btree/Editor/general_fcall/gener
 var general_decorator_scene = preload("res://addons/btree/Editor/general_decorator/general_decorator.tscn")
 var general_fcall_class = preload("res://addons/btree/Editor/general_fcall/general_fcall.gd")
 var minim_scene = preload("res://addons/btree/Editor/minim_node/minim_node.tscn")
+var inverter_scene = preload("res://addons/btree/Editor/inverter/inverter.tscn")
 
 func build_tree_from_data():
 	if  not data:
@@ -142,6 +143,11 @@ func create_node(n):
 	elif  n.type == 13:
 		var r = general_decorator_scene.instance()
 		r.as_random_sequence()
+		r.name = n.name
+		r.set_data(n.data)
+		return r
+	elif n.type == 14:
+		var r = inverter_scene.instance()
 		r.name = n.name
 		r.set_data(n.data)
 		return r

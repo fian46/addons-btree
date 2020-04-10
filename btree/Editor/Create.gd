@@ -9,6 +9,7 @@ var repeat_scene = preload("res://addons/btree/Editor/repeat/repeat.tscn")
 var wait_scene = preload("res://addons/btree/Editor/wait_node/wait_node.tscn")
 var general_fcall_scene = preload("res://addons/btree/Editor/general_fcall/general_fcall.tscn")
 var general_decorator_scene = preload("res://addons/btree/Editor/general_decorator/general_decorator.tscn")
+var inverter = preload("res://addons/btree/Editor/inverter/inverter.tscn")
 
 var pop_pos = Vector2.ZERO
 
@@ -51,6 +52,8 @@ func id_pressed(id):
 		12:
 			inst = general_decorator_scene.instance()
 			inst.as_random_sequence()
+		13:
+			inst = inverter.instance()
 	inst.offset = (get_parent().get_parent().scroll_offset / zoom) + (get_parent().get_parent().get_local_mouse_position() / zoom)
 	get_parent().get_parent().add_child(inst)
 	return
@@ -72,4 +75,5 @@ func _ready():
 	pop.add_item("Race Node")
 	pop.add_item("Random Selector")
 	pop.add_item("Random Sequence")
+	pop.add_item("Inverter")
 	return
