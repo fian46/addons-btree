@@ -1,12 +1,12 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://addons/btree/Editor/mute/mute.gd" type="Script" id=1]
+[ext_resource path="res://addons/btree/Editor/inverter/inverter.gd" type="Script" id=1]
 
-[node name="mute" type="GraphNode"]
+[node name="inverter" type="GraphNode"]
 margin_right = 92.0
 margin_bottom = 43.0
 hint_tooltip = "the child result always succeed"
-title = "mute"
+title = "inverter"
 show_close = true
 resizable = true
 slot/0/left_enabled = true
@@ -23,7 +23,7 @@ __meta__ = {
 [node name="slot0" type="Label" parent="."]
 margin_left = 32.0
 margin_top = 48.0
-margin_right = 115.0
+margin_right = 144.0
 margin_bottom = 73.0
-[connection signal="close_request" from="." to="." method="_on_mute_close_request"]
-[connection signal="resize_request" from="." to="." method="_on_mute_resize_request"]
+[connection signal="close_request" from="." to="." method="_on_inverter_close_request"]
+[connection signal="resize_request" from="." to="." method="_on_inverter_resize_request"]

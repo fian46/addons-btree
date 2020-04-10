@@ -334,6 +334,29 @@ class Mute extends TNode:
 			status.succeed()
 		return status.status
 
+class Inverter extends TNode:
+	
+	func reset():
+		status.reset()
+		if  get_child_count() == 1:
+			get_child(0).reset()
+		return
+	
+	func tick()->int:
+		if  status.status != Status.RUNNING:
+			return status.status
+		if  get_child_count() == 0:
+			status.succeed()
+			return status.status
+		var r = get_child(0).tick()
+		if  r != Status.RUNNING:
+			if  r == Status.SUCCEED:
+				status.failed()
+			else:
+				status.succeed()
+		return status.status
+
+
 class Repeat extends TNode:
 	
 	var tick_count = 0
@@ -466,6 +489,8 @@ static func create_runtime(data:Dictionary, target) -> TNode:
 		current = RandomSelector.new()
 	elif data.type == 13:
 		current = RandomSequence.new()
+	elif data.type == 14:
+		current = Inverter.new()
 	elif data.type == 99:
 		current = create_runtime(data.data.data.root, target)
 	if  current:
