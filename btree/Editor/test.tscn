@@ -13,16 +13,18 @@ script = ExtResource( 1 )
 [node name="TreeEditor" parent="." instance=ExtResource( 2 )]
 size_flags_horizontal = 3
 size_flags_vertical = 3
-scroll_offset = Vector2( 0, 0 )
 
 [node name="Label" type="Label" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 0
 custom_colors/font_color = Color( 1, 0, 0, 1 )
-text = "No BTREE node is selected"
+text = "No BTREE node is selected OR the parent script is ERROR !"
 align = 1
 valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="hint" type="VBoxContainer" parent="."]
 anchor_right = 1.0

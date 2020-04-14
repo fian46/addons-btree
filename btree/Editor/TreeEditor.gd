@@ -15,6 +15,14 @@ func reload():
 		return
 	if  not control:
 		return
+	var pscript:GDScript = data.get_parent().get_script()
+	var cscript:GDScript = GDScript.new()
+	cscript.set_source_code(pscript.get_source_code())
+	if  cscript.reload(false) != OK:
+#		hacky trick to compile gdscript implementation
+#		different language need different implementation
+		get_parent().halt(true)
+		return
 	build_tree_from_data()
 	return
 
