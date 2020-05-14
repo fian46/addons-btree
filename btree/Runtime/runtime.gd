@@ -240,37 +240,11 @@ class Sequence extends TNode:
 		status.succeed()
 		return status.status
 
-class RandomSequence extends TNode:
-	var current_child = 0
-	
+class RandomSequence extends Sequence:
 	func reset():
-		status.reset()
-		current_child = 0
-		for c in children:
-			if  c.ticked:
-				c.reset()
+		.reset()
 		children.shuffle()
-		ticked = false
 		return
-	
-	func tick()->int:
-		ticked = true
-		if  status.status != Status.RUNNING:
-			return status.status
-		if  children.empty():
-			status.succeed()
-			return status.status
-		for i in range(current_child, children.size()):
-			current_child = i
-			var c = children[i]
-			var r = c.tick()
-			if  r == Status.RUNNING:
-				return status.status
-			elif r == Status.FAILED:
-				status.failed()
-				return status.status
-		status.succeed()
-		return status.status
 
 class Selector extends TNode:
 	var current_child = 0
@@ -303,37 +277,11 @@ class Selector extends TNode:
 		status.failed()
 		return status.status
 
-class RandomSelector extends TNode:
-	var current_child = 0
-	
+class RandomSelector extends Selector:
 	func reset():
-		status.reset()
-		current_child = 0
-		for c in children:
-			if  c.ticked:
-				c.reset()
+		.reset()
 		children.shuffle()
-		ticked = false
 		return
-	
-	func tick()->int:
-		ticked = true
-		if  status.status != Status.RUNNING:
-			return status.status
-		if  children.empty():
-			status.succeed()
-			return status.status
-		for i in range(current_child, children.size()):
-			current_child = i
-			var c = children[i]
-			var r = c.tick()
-			if  r == Status.RUNNING:
-				return status.status
-			elif r == Status.SUCCEED:
-				status.succeed()
-				return status.status
-		status.failed()
-		return status.status
 
 class Mute extends TNode:
 	
