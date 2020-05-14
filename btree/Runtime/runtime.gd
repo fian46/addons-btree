@@ -43,8 +43,7 @@ class TNode:
 class Race extends TNode:
 	func reset():
 		status.reset()
-		for i in range(children.size()):
-			var c = children[i]
+		for c in children:
 			if  c.ticked:
 				c.reset()
 		ticked = false
@@ -58,13 +57,12 @@ class Race extends TNode:
 			status.succeed()
 			return status.status
 		var fcount = 0
-		for i in range(children.size()):
-			var c = children[i]
+		for c in children:
 			var pr = c.status.status
 			var r = pr
 			
 			if  pr == Status.RUNNING:
-				r = children[i].tick()
+				r = c.tick()
 			
 			if  r == Status.SUCCEED:
 				status.succeed()
@@ -80,8 +78,7 @@ class Paralel extends TNode:
 	
 	func reset():
 		status.reset()
-		for i in range(children.size()):
-			var c = children[i]
+		for c in children:
 			if  c.ticked:
 				c.reset()
 		ticked = false
@@ -97,8 +94,7 @@ class Paralel extends TNode:
 			return status.status
 		
 		var scount = 0
-		for i in range(children.size()):
-			var c = children[i]
+		for c in children:
 			var pr = c.status.status
 			var r = pr
 			if  pr == Status.RUNNING:
@@ -116,8 +112,7 @@ class PSelector extends TNode:
 	
 	func reset():
 		status.reset()
-		for i in range(children.size()):
-			var c = children[i]
+		for c in children:
 			if  c.ticked:
 				c.reset()
 		ticked = false
@@ -130,12 +125,12 @@ class PSelector extends TNode:
 		if  children.size() == 0:
 			status.failed()
 			return status.status
-		for i in range(0, children.size()):
-			var r = children[i].tick()
+		for c in children:
+			var r = c.tick()
 			if  r == Status.FAILED:
 				continue
 			if  r == Status.SUCCEED:
-				var cr = children[i].children[0].tick()
+				var cr = c.children[0].tick()
 				if  cr == Status.FAILED:
 					continue
 				if  cr == Status.RUNNING:
@@ -222,8 +217,7 @@ class Sequence extends TNode:
 	func reset():
 		status.reset()
 		current_child = 0
-		for i in range(children.size()):
-			var c = children[i]
+		for c in children:
 			if  c.ticked:
 				c.reset()
 		ticked = false
@@ -231,7 +225,7 @@ class Sequence extends TNode:
 	
 	func tick()->int:
 		ticked = true
-		if  status.status != status.RUNNING:
+		if  status.status != Status.RUNNING:
 			return status.status
 		if  children.size() == 0:
 			status.succeed()
@@ -254,8 +248,7 @@ class RandomSequence extends TNode:
 	func reset():
 		status.reset()
 		current_child = 0
-		for i in range(children.size()):
-			var c = children[i]
+		for c in children:
 			if  c.ticked:
 				c.reset()
 		children.shuffle()
@@ -264,7 +257,7 @@ class RandomSequence extends TNode:
 	
 	func tick()->int:
 		ticked = true
-		if  status.status != status.RUNNING:
+		if  status.status != Status.RUNNING:
 			return status.status
 		if  children.size() == 0:
 			status.succeed()
@@ -287,8 +280,7 @@ class Selector extends TNode:
 	func reset():
 		status.reset()
 		current_child = 0
-		for i in range(children.size()):
-			var c = children[i]
+		for c in children:
 			if  c.ticked:
 				c.reset()
 		ticked = false
@@ -319,8 +311,7 @@ class RandomSelector extends TNode:
 	func reset():
 		status.reset()
 		current_child = 0
-		for i in range(children.size()):
-			var c = children[i]
+		for c in children:
 			if  c.ticked:
 				c.reset()
 		children.shuffle()
