@@ -216,15 +216,15 @@ func build_tree(root, conn:Array, nodes):
 	for c in conn:
 		if  c.from == root.name:
 			removed.append(c)
-	
+
 	root.child = children
 	removed.sort_custom(self, "sort_from")
-	
+
 	for i in removed:
 		var ch = find(i.to, nodes)
 		children.append(ch)
 		conn.remove(conn.find(i))
-	
+
 	for i in children:
 		build_tree(i, conn, nodes)
 	return
@@ -248,53 +248,41 @@ func slot_removed(name, slot):
 			disconnect_node(i.from, i.from_port, i.to, i.to_port)
 	return
 
-var ctrl = false
-var shift = false
-
 func _input(event):
 	if  not is_visible_in_tree():
 		return
+
 	if  event is InputEventKey:
-		if  event.scancode == KEY_CONTROL and event.pressed:
-			ctrl = true
-		elif event.scancode == KEY_CONTROL and not event.pressed:
-			ctrl = false
-		
-		if  event.scancode == KEY_SHIFT and event.pressed:
-			shift = true
-		elif event.scancode == KEY_SHIFT and not event.pressed:
-			shift = false
-		
-		if  event.scancode == KEY_M and not event.pressed and ctrl and shift:
+		if  event.scancode == KEY_M and not event.pressed and event.control and event.shift:
 			minimize_node()
 			get_parent().hint("Node Minimized")
-		
-		if  event.scancode == KEY_C and not event.pressed and ctrl and shift:
+
+		if  event.scancode == KEY_C and not event.pressed and event.control and event.shift:
 			copy_node()
 			get_parent().hint("Recursive Duplicate Node")
-		
-		if  event.scancode == KEY_X and not event.pressed and ctrl and shift:
+
+		if  event.scancode == KEY_X and not event.pressed and event.control and event.shift:
 			rdelete_node()
 			get_parent().hint("Recursive Delete Node")
-		
-		if  event.scancode == KEY_SPACE and event.pressed and ctrl and shift:
+
+		if  event.scancode == KEY_SPACE and event.pressed and event.control and event.shift:
 			rmove_node()
 			get_parent().hint("Recursive Move Node")
-		
-		if  event.scancode == KEY_S and not event.pressed and ctrl:
+
+		if  event.scancode == KEY_S and not event.pressed and event.control:
 			_on_save_pressed()
-		
-		if  event.scancode == KEY_F  and not event.pressed and ctrl:
+
+		if  event.scancode == KEY_F  and not event.pressed and event.control:
 			focus_selected()
 		return
-	
+
 	if  event is InputEventMouseButton:
-		if  event.pressed and event.button_index == 4 and ctrl and shift:
+		if  event.pressed and event.button_index == 4 and event.control and event.shift:
 			zoom += 0.1
 			accept_event()
 			get_parent().hint("Zoom In")
 			return
-		if  event.pressed and event.button_index == 5 and ctrl and shift:
+		if  event.pressed and event.button_index == 5 and event.control and event.shift:
 			zoom -= 0.1
 			accept_event()
 			get_parent().hint("Zoom Out")
@@ -313,9 +301,9 @@ func copy_node():
 	if  selected.name == "root":
 		get_parent().hint("Cannot Duplicate \"root\" Node !")
 		return
-	
+
 	var root_offset = (scroll_offset / zoom) + (get_local_mouse_position() / zoom)
-	
+
 	var nodes = []
 	for i in get_children():
 		if  i is GraphNode:
@@ -326,11 +314,11 @@ func copy_node():
 			}
 			nodes.append(node)
 	var cp = find(selected.name, nodes)
-	
+
 	build_tree(cp, get_connection_list(), nodes)
 	nodes.clear()
 	rec_populate(cp, nodes)
-	
+
 	var inst_node = []
 	var mapping = {}
 	for i in nodes:
@@ -340,18 +328,18 @@ func copy_node():
 		inst_node.append(inst)
 		var mapping_name = inst.name
 		mapping[ori_name] = mapping_name
-	
+
 	var rinst = null
 	for i in inst_node:
 		if  i.name == mapping[cp.name]:
 			rinst = i
 			break
-	
+
 	if  rinst:
 		var shifted = root_offset - rinst.offset
 		for i in inst_node:
 			i.offset += shifted
-	
+
 	for i in nodes:
 		for j in get_connection_list():
 			if  i.name == j.from:
@@ -377,7 +365,7 @@ func minimize_node():
 	var m_inst = minim_scene.instance()
 	m_inst.offset = soffset
 	add_child(m_inst)
-	
+
 	var nodes = []
 	for i in get_children():
 		if  i is GraphNode:
@@ -387,28 +375,28 @@ func minimize_node():
 				"data":i.get_data()
 			}
 			nodes.append(node)
-	
+
 	var cp = find(selected.name, nodes)
 	build_tree(cp, get_connection_list(), nodes)
 	nodes.clear()
 	rec_populate(cp, nodes)
-	
+
 	var connection = []
 	for i in nodes:
 		for j in get_connection_list():
 			if  i.name == j.from:
 				connection.append(j)
-	
+
 	var current_connection = null
 	for i in get_connection_list():
 		if  i.to == cp.name:
 			current_connection = i
 			break
-	
+
 	m_inst.data = {}
 	m_inst.data["connection"] = connection
 	m_inst.data["nodes"] = nodes
-	
+
 	nodes = []
 	for i in get_children():
 		if  i is GraphNode:
@@ -418,21 +406,21 @@ func minimize_node():
 				"data":i.get_data()
 			}
 			nodes.append(node)
-	
+
 	var mroot = find(selected.name, nodes)
 	build_tree(mroot, get_connection_list(), nodes)
 	m_inst.data["root"] = mroot
-	
+
 	for i in get_connection_list():
 		if  i.to == selected.name:
 			disconnect_node(i.from, i.from_port, i.to, i.to_port)
-	
+
 	if  current_connection:
 		connect_node(current_connection.from, current_connection.from_port, m_inst.name, 0)
-	
+
 	for i in m_inst.data["connection"]:
 		disconnect_node(i.from, i.from_port, i.to, i.to_port)
-	
+
 	for i in m_inst.data["nodes"]:
 		if  has_node(i.name):
 			var n = get_node(i.name)
@@ -443,11 +431,11 @@ func minimize_node():
 
 func maximize_node(minim):
 	var data  = minim.data
-	
+
 	var connection = data.connection
 	var nodes = data.nodes
 	var root = data.root
-	
+
 	var inst_node = []
 	var mapping = {}
 	for i in nodes:
@@ -457,28 +445,28 @@ func maximize_node(minim):
 		inst_node.append(inst)
 		var mapping_name = inst.name
 		mapping[ori_name] = mapping_name
-	
+
 	var rinst = null
 	for i in inst_node:
 		if  i.name == mapping[root.name]:
 			rinst = i
 			break
-	
+
 	if  rinst:
 		var shifted = minim.offset - rinst.offset
 		for i in inst_node:
 			i.offset += shifted
-	
+
 	for i in nodes:
 		for j in connection:
 			if  i.name == j.from or i.name == j.to:
 				connect_node(mapping[j.from], j.from_port, mapping[j.to], j.to_port)
-	
+
 	for i in get_connection_list():
 		if  i.to == minim.name:
 			disconnect_node(i.from, i.from_port, i.to, i.to_port)
 			connect_node(i.from, i.from_port, rinst.name, 0)
-	
+
 	minim.queue_free()
 	selected = rinst
 	set_selected(rinst)
@@ -494,7 +482,7 @@ func rdelete_node():
 	if  selected.name == "root":
 		get_parent().hint("Cannot Delete \"root\" Node")
 		return
-	
+
 	var nodes = []
 	for i in get_children():
 		if  i is GraphNode:
@@ -504,17 +492,17 @@ func rdelete_node():
 				"data":i.get_data()
 			}
 			nodes.append(node)
-	
+
 	var cp = find(selected.name, nodes)
 	build_tree(cp, get_connection_list(), nodes)
 	nodes.clear()
 	rec_populate(cp, nodes)
-	
+
 	for i in nodes:
 		for j in get_connection_list():
 			if  i.name == j.from or i.name == j.to:
 				disconnect_node(j.from, j.from_port, j.to, j.to_port)
-	
+
 	for i in nodes:
 		if  has_node(i.name):
 			var n = get_node(i.name)
@@ -530,7 +518,7 @@ func rmove_node():
 	if  not selected.selected:
 		get_parent().hint("No Node Selected")
 		return
-	
+
 	var nodes = []
 	for i in get_children():
 		if  i is GraphNode:
@@ -540,18 +528,18 @@ func rmove_node():
 				"data":i.get_data()
 			}
 			nodes.append(node)
-	
+
 	var cp = find(selected.name, nodes)
 	build_tree(cp, get_connection_list(), nodes)
 	nodes.clear()
 	rec_populate(cp, nodes)
-	
+
 	if  not has_node(cp.name):
 		return
-	
+
 	var rn = get_node(cp.name)
 	var shifted = root_offset - rn.offset
-	
+
 	for i in nodes:
 		if  has_node(i.name):
 			var n = get_node(i.name)
@@ -594,7 +582,7 @@ func _on_search_bar_text_changed(new_text):
 					itoken = i.search_token()
 				if  most_similar is general_fcall_class:
 					mtoken = most_similar.search_token()
-				if  mtoken.similarity(new_text) < itoken.similarity(new_text): 
+				if  mtoken.similarity(new_text) < itoken.similarity(new_text):
 					most_similar = i
 	if  most_similar:
 		scroll_offset = most_similar.offset * zoom - ((rect_size / 2) - (most_similar.rect_size / 2))
