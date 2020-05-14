@@ -53,7 +53,7 @@ class Race extends TNode:
 		ticked = true
 		if  status.status != Status.RUNNING:
 			return status.status
-		if  children.size() == 0:
+		if  children.empty():
 			status.succeed()
 			return status.status
 		var fcount = 0
@@ -89,7 +89,7 @@ class Paralel extends TNode:
 		if  status.status != Status.RUNNING:
 			return status.status
 		
-		if  children.size() == 0:
+		if  children.empty():
 			status.succeed()
 			return status.status
 		
@@ -122,7 +122,7 @@ class PSelector extends TNode:
 		ticked = true
 		if  status.status != Status.RUNNING:
 			return status.status
-		if  children.size() == 0:
+		if  children.empty():
 			status.failed()
 			return status.status
 		for c in children:
@@ -130,7 +130,7 @@ class PSelector extends TNode:
 			if  r == Status.FAILED:
 				continue
 			if  r == Status.SUCCEED:
-				var cr = c.children[0].tick()
+				var cr = c.children.front().tick()
 				if  cr == Status.FAILED:
 					continue
 				if  cr == Status.RUNNING:
@@ -160,16 +160,15 @@ class PCondition extends TNode:
 	
 	func reset():
 		status.reset()
-		if  children.size() == 1:
-			var c = children[0]
-			if  c.ticked:
-				c.reset()
+		var c = children.front()
+		if c != null and c.ticked:
+			c.reset()
 		ticked = false
 		return
 	
 	func tick()->int:
 		ticked = true
-		if  children.size() == 0:
+		if  children.empty():
 			status.failed()
 			return status.status
 		target.call_func(status)
@@ -178,10 +177,9 @@ class PCondition extends TNode:
 class Root extends TNode:
 	func reset():
 		status.reset()
-		if  children.size() == 1:
-			var c = children[0]
-			if  c.ticked:
-				c.reset()
+		var c = children.front()
+		if c != null and c.ticked:
+			c.reset()
 		ticked = false
 		return
 	
@@ -190,11 +188,11 @@ class Root extends TNode:
 		if  status.status != Status.RUNNING:
 			return status.status
 		
-		if  children.size() == 0:
+		if  children.empty():
 			status.failed()
 			return status.status
 		
-		return children[0].tick()
+		return children.front().tick()
 
 class Task extends TNode:
 	var target = null
@@ -227,7 +225,7 @@ class Sequence extends TNode:
 		ticked = true
 		if  status.status != Status.RUNNING:
 			return status.status
-		if  children.size() == 0:
+		if  children.empty():
 			status.succeed()
 			return status.status
 		for i in range(current_child, children.size()):
@@ -259,7 +257,7 @@ class RandomSequence extends TNode:
 		ticked = true
 		if  status.status != Status.RUNNING:
 			return status.status
-		if  children.size() == 0:
+		if  children.empty():
 			status.succeed()
 			return status.status
 		for i in range(current_child, children.size()):
@@ -290,7 +288,7 @@ class Selector extends TNode:
 		ticked = true
 		if  status.status != Status.RUNNING:
 			return status.status
-		if  children.size() == 0:
+		if  children.empty():
 			status.succeed()
 			return status.status
 		for i in range(current_child, children.size()):
@@ -322,7 +320,7 @@ class RandomSelector extends TNode:
 		ticked = true
 		if  status.status != Status.RUNNING:
 			return status.status
-		if  children.size() == 0:
+		if  children.empty():
 			status.succeed()
 			return status.status
 		for i in range(current_child, children.size()):
@@ -341,10 +339,9 @@ class Mute extends TNode:
 	
 	func reset():
 		status.reset()
-		if  children.size() == 1:
-			var c = children[0]
-			if  c.ticked:
-				c.reset()
+		var c = children.front()
+		if c != null and c.ticked:
+			c.reset()
 		ticked = false
 		return
 	
@@ -352,10 +349,10 @@ class Mute extends TNode:
 		ticked = true
 		if  status.status != Status.RUNNING:
 			return status.status
-		if  children.size() == 0:
+		if  children.empty():
 			status.succeed()
 			return status.status
-		var r = children[0].tick()
+		var r = children.front().tick()
 		if  r != Status.RUNNING:
 			status.succeed()
 		return status.status
@@ -364,10 +361,9 @@ class Inverter extends TNode:
 	
 	func reset():
 		status.reset()
-		if  children.size() == 1:
-			var c = children[0]
-			if  c.ticked:
-				c.reset()
+		var c = children.front()
+		if c != null and c.ticked:
+			c.reset()
 		ticked = false
 		return
 	
@@ -375,10 +371,10 @@ class Inverter extends TNode:
 		ticked = true
 		if  status.status != Status.RUNNING:
 			return status.status
-		if  children.size() == 0:
+		if  children.empty():
 			status.succeed()
 			return status.status
-		var r = children[0].tick()
+		var r = children.front().tick()
 		if  r != Status.RUNNING:
 			if  r == Status.SUCCEED:
 				status.failed()
@@ -395,10 +391,9 @@ class Repeat extends TNode:
 	func reset():
 		tick_count = count
 		status.reset()
-		if  children.size() == 1:
-			var c = children[0]
-			if  c.ticked:
-				c.reset()
+		var c = children.front()
+		if c != null and c.ticked:
+			c.reset()
 		ticked = false
 		return
 	
@@ -409,12 +404,12 @@ class Repeat extends TNode:
 			return status.status
 		if  status.status != Status.RUNNING:
 			return status.status
-		if  children.size() == 0:
+		if  children.empty():
 			status.succeed()
 			return status.status
-		var result = children[0].tick()
+		var result = children.front().tick()
 		if  result == Status.SUCCEED:
-			children[0].reset()
+			children.front().reset()
 			if  count > 0:
 				tick_count -= 1
 				if  tick_count == 0:
@@ -431,10 +426,9 @@ class WhileNode extends TNode:
 	
 	func reset():
 		status.reset()
-		if  children.size() == 1:
-			var c = children[0]
-			if  c.ticked:
-				c.reset()
+		var c = children.front()
+		if c != null and c.ticked:
+			c.reset()
 		ticked = false
 		return
 	
@@ -442,13 +436,13 @@ class WhileNode extends TNode:
 		ticked = true
 		if  status.status != Status.RUNNING:
 			return status.status
-		if  children.size() == 0:
+		if  children.empty():
 			status.failed()
 			return status.status
 		status.failed()
 		target.call_func(status)
 		if  status.status == Status.SUCCEED:
-			status.status = children[0].tick()
+			status.status = children.front().tick()
 		return status.status
 
 class WaitNode extends TNode:
