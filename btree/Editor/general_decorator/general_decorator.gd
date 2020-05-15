@@ -1,6 +1,8 @@
 tool
 extends GraphNode
 
+const Runtime = preload('../../Runtime/runtime.gd')
+
 var type = -1
 
 func _ready():
@@ -15,32 +17,32 @@ func _enter_tree():
 	return
 
 func as_sequence():
-	type = 2
+	type = Runtime.TNodeTypes.SEQUENCE
 	name = "sequence"
 	return
 
 func as_selector():
-	type = 3
+	type = Runtime.TNodeTypes.SELECTOR
 	name = "selector"
 	return
 
 func as_paralel():
-	type = 6
+	type = Runtime.TNodeTypes.PARALEL
 	name = "paralel"
 	return
 
 func as_race():
-	type = 11
+	type = Runtime.TNodeTypes.RACE
 	name = "race"
 	return
 
 func as_random_selector():
-	type = 12
+	type = Runtime.TNodeTypes.RANDOM_SELECTOR
 	name = "random_selector"
 	return
 
 func as_random_sequence():
-	type = 13
+	type = Runtime.TNodeTypes.RANDOM_SEQUENCE
 	name = "random_sequence"
 	return
 

@@ -1,7 +1,9 @@
 tool
 extends GraphNode
 
-const type = 7
+const Runtime = preload('../../Runtime/runtime.gd')
+
+const type = Runtime.TNodeTypes.MUTE
 
 func _enter_tree():
 	title = name

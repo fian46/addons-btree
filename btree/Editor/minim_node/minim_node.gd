@@ -1,7 +1,9 @@
 tool
 extends GraphNode
 
-const type = 99
+const Runtime = preload('../../Runtime/runtime.gd')
+
+const type = Runtime.TNodeTypes.MINIM
 var data
 
 func _ready():
