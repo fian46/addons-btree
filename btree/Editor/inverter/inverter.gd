@@ -1,7 +1,9 @@
 tool
 extends GraphNode
 
-const type = 14
+const Runtime = preload('../../Runtime/runtime.gd')
+
+const type = Runtime.TNodeTypes.INVERTER
 
 func _enter_tree():
 	title = name

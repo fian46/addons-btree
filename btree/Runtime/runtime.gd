@@ -34,6 +34,9 @@ class TNode:
 	var children = Array()
 	var ticked = false
 	
+	func _init(data: Dictionary = {}, target = null):
+		pass
+	
 	func reset():
 		return
 	
@@ -41,6 +44,9 @@ class TNode:
 		return 0
 
 class Race extends TNode:
+	func _init(data: Dictionary = {}, target = null).(data, target):
+		pass
+		
 	func reset():
 		status.reset()
 		for c in children:
@@ -75,7 +81,9 @@ class Race extends TNode:
 		return status.status
 
 class Paralel extends TNode:
-	
+	func _init(data: Dictionary = {}, target = null).(data, target):
+		pass
+
 	func reset():
 		status.reset()
 		for c in children:
@@ -109,7 +117,9 @@ class Paralel extends TNode:
 		return status.status
 
 class PSelector extends TNode:
-	
+	func _init(data: Dictionary = {}, target = null).(data, target):
+		pass
+
 	func reset():
 		status.reset()
 		for c in children:
@@ -153,10 +163,11 @@ class PConditionStatus extends Status:
 class PCondition extends TNode:
 	
 	var target = null
-	
-	func _init():
+
+	func _init(data: Dictionary, target).(data, target):
 		status = PConditionStatus.new()
-		return
+		self.target = funcref(target, data.fn)
+		status.params = data.get('values', [])
 	
 	func reset():
 		status.reset()
@@ -175,6 +186,9 @@ class PCondition extends TNode:
 		return status.status
 
 class Root extends TNode:
+	func _init(data: Dictionary = {}, target = null).(data, target):
+		pass
+		
 	func reset():
 		status.reset()
 		var c = children.front()
@@ -197,6 +211,10 @@ class Root extends TNode:
 class Task extends TNode:
 	var target = null
 	
+	func _init(data: Dictionary, target).(data, target):
+		self.target = funcref(target, data.fn)
+		status.params = data.get('values', [])
+	
 	func reset():
 		status.reset()
 		ticked = false
@@ -211,6 +229,9 @@ class Task extends TNode:
 
 class Sequence extends TNode:
 	var current_child = 0
+	
+	func _init(data: Dictionary = {}, target = null).(data, target):
+		pass
 	
 	func reset():
 		status.reset()
@@ -241,6 +262,9 @@ class Sequence extends TNode:
 		return status.status
 
 class RandomSequence extends Sequence:
+	func _init(data: Dictionary = {}, target = null).(data, target):
+		pass
+		
 	func reset():
 		.reset()
 		children.shuffle()
@@ -249,6 +273,9 @@ class RandomSequence extends Sequence:
 class Selector extends TNode:
 	var current_child = 0
 	
+	func _init(data: Dictionary = {}, target = null).(data, target):
+		pass
+		
 	func reset():
 		status.reset()
 		current_child = 0
@@ -278,13 +305,18 @@ class Selector extends TNode:
 		return status.status
 
 class RandomSelector extends Selector:
+	func _init(data: Dictionary = {}, target = null).(data, target):
+		pass
+		
 	func reset():
 		.reset()
 		children.shuffle()
 		return
 
 class Mute extends TNode:
-	
+	func _init(data: Dictionary = {}, target = null).(data, target):
+		pass
+		
 	func reset():
 		status.reset()
 		var c = children.front()
@@ -306,7 +338,9 @@ class Mute extends TNode:
 		return status.status
 
 class Inverter extends TNode:
-	
+	func _init(data: Dictionary = {}, target = null).(data, target):
+		pass
+		
 	func reset():
 		status.reset()
 		var c = children.front()
@@ -335,6 +369,10 @@ class Repeat extends TNode:
 	
 	var tick_count = 0
 	var count = 0
+	
+	func _init(data: Dictionary, target).(data, target):
+		count = data.count
+		tick_count = count
 	
 	func reset():
 		tick_count = count
@@ -372,6 +410,10 @@ class Repeat extends TNode:
 class WhileNode extends TNode:
 	var target = null
 	
+	func _init(data: Dictionary, target).(data, target):
+		self.target = funcref(target, data.fn)
+		status.params = data.get('values', [])
+	
 	func reset():
 		status.reset()
 		var c = children.front()
@@ -398,6 +440,10 @@ class WaitNode extends TNode:
 	var tick_count = 0
 	var count = 0
 	
+	func _init(data: Dictionary, target).(data, target):
+		count = data.count
+		tick_count = count
+	
 	func reset():
 		tick_count = count
 		status.reset()
@@ -415,61 +461,59 @@ class WaitNode extends TNode:
 		if  tick_count <= 0:
 			status.succeed()
 		return status.status
+		
+enum TNodeTypes {
+	ROOT = 0,
+	TASK = 1,
+	SEQUENCE = 2,
+	SELECTOR = 3,
+	PRIORITY_SELECTOR = 4,
+	PRIORITY_CONDITION = 5,
+	PARALEL = 6,
+	MUTE = 7,
+	REPEAT = 8,
+	WHILE = 9,
+	WAIT = 10,
+	RACE = 11,
+	RANDOM_SELECTOR = 12,
+	RANDOM_SEQUENCE = 13,
+	INVERTER = 14,
+	
+	MINIM = 99
+}
+
+const constructors = {}
+static func get_constructors() -> Dictionary:
+	if not constructors.empty():
+		return constructors
+	constructors[TNodeTypes.ROOT] = Root
+	constructors[TNodeTypes.TASK] = Task
+	constructors[TNodeTypes.SEQUENCE] = Sequence
+	constructors[TNodeTypes.SELECTOR] = Selector
+	constructors[TNodeTypes.PRIORITY_SELECTOR] = PSelector
+	constructors[TNodeTypes.PRIORITY_CONDITION] = PCondition
+	constructors[TNodeTypes.PARALEL] = Paralel
+	constructors[TNodeTypes.MUTE] = Mute
+	constructors[TNodeTypes.REPEAT] = Repeat
+	constructors[TNodeTypes.WHILE] = WhileNode
+	constructors[TNodeTypes.WAIT] = WaitNode
+	constructors[TNodeTypes.RACE] = Race
+	constructors[TNodeTypes.RANDOM_SELECTOR] = RandomSelector
+	constructors[TNodeTypes.RANDOM_SEQUENCE] = RandomSequence
+	constructors[TNodeTypes.INVERTER] = Inverter
+	return constructors
 
 static func create_runtime(data:Dictionary, target) -> TNode:
 	if  data.empty():
 		return null
+
 	var current = null
-	if  data.type == 0:
-		current = Root.new()
-	elif  data.type == 1:
-		current = Task.new()
-		current.target = funcref(target, data.data.fn)
-		if  data.data.has("values"):
-			current.status.params = data.data.values
-		else:
-			current.status.params = []
-	elif  data.type == 2:
-		current = Sequence.new()
-	elif  data.type == 3:
-		current = Selector.new()
-	elif  data.type == 4:
-		current = PSelector.new()
-	elif  data.type == 5:
-		current = PCondition.new()
-		current.target = funcref(target, data.data.fn)
-		if  data.data.has("values"):
-			current.status.params = data.data.values
-		else:
-			current.status.params = []
-	elif data.type == 6:
-		current = Paralel.new()
-	elif data.type == 7:
-		current = Mute.new()
-	elif data.type == 8:
-		current = Repeat.new()
-		current.count = data.data.count
-		current.tick_count = current.count
-	elif data.type == 9:
-		current = WhileNode.new()
-		current.target = funcref(target, data.data.fn)
-		if  data.data.has("values"):
-			current.status.params = data.data.values
-		else:
-			current.status.params = []
-	elif data.type == 10:
-		current = WaitNode.new()
-		current.count = data.data.count
-		current.tick_count = current.count
-	elif data.type == 11:
-		current = Race.new()
-	elif data.type == 12:
-		current = RandomSelector.new()
-	elif data.type == 13:
-		current = RandomSequence.new()
-	elif data.type == 14:
-		current = Inverter.new()
-	elif data.type == 99:
+	
+	var t_node_type = get_constructors().get(data.type)
+	if t_node_type != null:
+		current = t_node_type.new(data.data, target)
+	
+	if data.type == TNodeTypes.MINIM:
 		current = create_runtime(data.data.data.root, target)
 	if  current:
 		for child in data.child:
