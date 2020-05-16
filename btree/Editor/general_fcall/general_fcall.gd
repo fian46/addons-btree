@@ -1,10 +1,13 @@
 tool
 extends GraphNode
 
-var type = 1
+const Runtime = preload('../../Runtime/runtime.gd')
+
+var type = Runtime.TNodeTypes.TASK
 var load_function = ""
 var params = []
 var param_scene = preload("res://addons/btree/Editor/task/param.tscn")
+
 
 func _ready():
 	connect("close_request", self, "self_close")
@@ -39,18 +42,18 @@ func _enter_tree():
 
 func as_task():
 	name = "task"
-	type = 1
+	type = Runtime.TNodeTypes.TASK
 	return
 
 func as_priority_condition():
 	name = "priority_condition"
-	type = 5
+	type = Runtime.TNodeTypes.PRIORITY_CONDITION
 	set_slot(0, true, 1, Color.yellow, true, 0, Color.blue)
 	return
 
 func as_while():
 	name = "while_node"
-	type = 9
+	type = Runtime.TNodeTypes.WHILE
 	set_slot(0, true, 0, Color.blue, true, 0, Color.blue)
 	return
 

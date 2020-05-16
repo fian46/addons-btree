@@ -1,7 +1,9 @@
 tool
 extends GraphNode
 
-const type = 8
+const Runtime = preload('../../Runtime/runtime.gd')
+
+const type = Runtime.TNodeTypes.REPEAT
 
 func _ready():
 	$slot0/count.value = 0

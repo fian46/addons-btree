@@ -58,6 +58,8 @@ var general_fcall_class = preload("res://addons/btree/Editor/general_fcall/gener
 var minim_scene = preload("res://addons/btree/Editor/minim_node/minim_node.tscn")
 var inverter_scene = preload("res://addons/btree/Editor/inverter/inverter.tscn")
 
+const Runtime = preload('../Runtime/runtime.gd')
+
 func build_tree_from_data():
 	if  not data:
 		return
@@ -69,7 +71,7 @@ func build_tree_from_data():
 	var root = data.tree.root
 	var conn = data.tree.connection
 	for n in nodes:
-		if  n.type == 0:
+		if  n.type == Runtime.TNodeTypes.ROOT:
 			var node = get_node("root")
 			node.set_data(n.data)
 		else:
@@ -80,86 +82,86 @@ func build_tree_from_data():
 	return
 
 func create_node(n):
-	if  n.type == 1:
+	if  n.type == Runtime.TNodeTypes.TASK:
 		var task = general_fcall_scene.instance()
 		task.as_task()
 		task.name = n.name
 		task.set_data(n.data)
 		return task
-	elif n.type == 2:
+	elif n.type == Runtime.TNodeTypes.SEQUENCE:
 		var seq = general_decorator_scene.instance()
 		seq.as_sequence()
 		seq.name = n.name
 		seq.set_data(n.data)
 		return seq
-	elif n.type == 3:
+	elif n.type == Runtime.TNodeTypes.SELECTOR:
 		var sel = general_decorator_scene.instance()
 		sel.as_selector()
 		sel.name = n.name
 		sel.set_data(n.data)
 		return sel
-	elif n.type == 4:
+	elif n.type == Runtime.TNodeTypes.PRIORITY_SELECTOR:
 		var pse = pselector_scene.instance()
 		pse.name = n.name
 		pse.set_data(n.data)
 		return pse
-	elif n.type == 5:
+	elif n.type == Runtime.TNodeTypes.PRIORITY_CONDITION:
 		var inst = general_fcall_scene.instance()
 		inst.as_priority_condition()
 		inst.name = n.name
 		inst.set_data(n.data)
 		return inst
-	elif n.type == 6:
+	elif n.type == Runtime.TNodeTypes.PARALEL:
 		var par = general_decorator_scene.instance()
 		par.as_paralel()
 		par.name = n.name
 		par.set_data(n.data)
 		return par
-	elif n.type == 7:
+	elif n.type == Runtime.TNodeTypes.MUTE:
 		var mute = mute_scene.instance()
 		mute.name = n.name
 		mute.set_data(n.data)
 		return mute
-	elif n.type == 8:
+	elif n.type == Runtime.TNodeTypes.REPEAT:
 		var rep = repeat_scene.instance()
 		rep.name = n.name
 		rep.set_data(n.data)
 		return rep
-	elif n.type == 9:
+	elif n.type == Runtime.TNodeTypes.WHILE:
 		var whi = general_fcall_scene.instance()
 		whi.as_while()
 		whi.name = n.name
 		whi.set_data(n.data)
 		return whi
-	elif n.type == 10:
+	elif n.type == Runtime.TNodeTypes.WAIT:
 		var w = wait_scene.instance()
 		w.name = n.name
 		w.set_data(n.data)
 		return w
-	elif n.type == 11:
+	elif n.type == Runtime.TNodeTypes.RACE:
 		var r = general_decorator_scene.instance()
 		r.as_race()
 		r.name = n.name
 		r.set_data(n.data)
 		return r
-	elif  n.type == 12:
+	elif  n.type == Runtime.TNodeTypes.RANDOM_SELECTOR:
 		var r = general_decorator_scene.instance()
 		r.as_random_selector()
 		r.name = n.name
 		r.set_data(n.data)
 		return r
-	elif  n.type == 13:
+	elif  n.type == Runtime.TNodeTypes.RANDOM_SEQUENCE:
 		var r = general_decorator_scene.instance()
 		r.as_random_sequence()
 		r.name = n.name
 		r.set_data(n.data)
 		return r
-	elif n.type == 14:
+	elif n.type == Runtime.TNodeTypes.INVERTER:
 		var r = inverter_scene.instance()
 		r.name = n.name
 		r.set_data(n.data)
 		return r
-	elif  n.type == 99:
+	elif  n.type == Runtime.TNodeTypes.MINIM:
 		var m = minim_scene.instance()
 		m.name = n.name
 		m.set_data(n.data)
