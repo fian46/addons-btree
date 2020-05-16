@@ -1,7 +1,9 @@
 tool
 extends GraphNode
 
-const type = 0
+const Runtime = preload('../../Runtime/runtime.gd')
+
+const type = Runtime.TNodeTypes.ROOT
 
 func get_data():
 	return {
