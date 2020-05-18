@@ -159,12 +159,14 @@ class PCondition extends TNode:
 		status = PConditionStatus.new()
 		self.target = funcref(target, data.fn)
 		status.params = data.get('values', [])
+		return
 	
 	func reset():
 		status.reset()
-		var c = children.front()
-		if c != null and c.ticked:
-			c.reset()
+		if  not children.empty():
+			var c = children.front()
+			if  c != null and c.ticked:
+				c.reset()
 		ticked = false
 		return
 	
@@ -179,9 +181,10 @@ class PCondition extends TNode:
 class Root extends TNode:
 	func reset():
 		status.reset()
-		var c = children.front()
-		if c != null and c.ticked:
-			c.reset()
+		if  not children.empty():
+			var c = children.front()
+			if  c != null and c.ticked:
+				c.reset()
 		ticked = false
 		return
 	
@@ -203,6 +206,7 @@ class Task extends TNode:
 		.setup(data, target)
 		self.target = funcref(target, data.fn)
 		status.params = data.get('values', [])
+		return
 	
 	func reset():
 		status.reset()
@@ -293,9 +297,10 @@ class RandomSelector extends Selector:
 class Mute extends TNode:
 	func reset():
 		status.reset()
-		var c = children.front()
-		if c != null and c.ticked:
-			c.reset()
+		if  not children.empty():
+			var c = children.front()
+			if  c != null and c.ticked:
+				c.reset()
 		ticked = false
 		return
 	
@@ -314,9 +319,10 @@ class Mute extends TNode:
 class Inverter extends TNode:
 	func reset():
 		status.reset()
-		var c = children.front()
-		if c != null and c.ticked:
-			c.reset()
+		if  not children.empty():
+			var c = children.front()
+			if  c != null and c.ticked:
+				c.reset()
 		ticked = false
 		return
 	
@@ -344,13 +350,15 @@ class Repeat extends TNode:
 		.setup(data, target)
 		count = data.count
 		tick_count = count
+		return
 	
 	func reset():
 		tick_count = count
 		status.reset()
-		var c = children.front()
-		if c != null and c.ticked:
-			c.reset()
+		if  not children.empty():
+			var c = children.front()
+			if  c != null and c.ticked:
+				c.reset()
 		ticked = false
 		return
 	
@@ -385,12 +393,14 @@ class WhileNode extends TNode:
 		.setup(data, target)
 		self.target = funcref(target, data.fn)
 		status.params = data.get('values', [])
+		return
 	
 	func reset():
 		status.reset()
-		var c = children.front()
-		if c != null and c.ticked:
-			c.reset()
+		if  not children.empty():
+			var c = children.front()
+			if  c != null and c.ticked:
+				c.reset()
 		ticked = false
 		return
 	
@@ -415,6 +425,7 @@ class WaitNode extends TNode:
 		.setup(data, target)
 		count = data.count
 		tick_count = count
+		return
 	
 	func reset():
 		tick_count = count
@@ -478,14 +489,11 @@ static func get_constructors() -> Dictionary:
 static func create_runtime(data:Dictionary, target) -> TNode:
 	if  data.empty():
 		return null
-
 	var current = null
-	
 	var t_node_type = get_constructors().get(data.type)
 	if t_node_type != null:
 		current = t_node_type.new()
 		current.setup(data.data, target)
-	
 	if data.type == TNodeTypes.MINIM:
 		current = create_runtime(data.data.data.root, target)
 	if  current:
