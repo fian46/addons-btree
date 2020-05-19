@@ -38,13 +38,6 @@ class TNode:
 		pass
 	
 	func reset():
-		return
-	
-	func tick() -> int:
-		return 0
-
-class Race extends TNode:
-	func reset():
 		status.reset()
 		for c in children:
 			if  c.ticked:
@@ -52,6 +45,10 @@ class Race extends TNode:
 		ticked = false
 		return
 	
+	func tick() -> int:
+		return Status.RUNNING
+
+class Race extends TNode:
 	func tick() -> int:
 		ticked = true
 		if  status.status != Status.RUNNING:
@@ -78,14 +75,6 @@ class Race extends TNode:
 		return status.status
 
 class Paralel extends TNode:
-	func reset():
-		status.reset()
-		for c in children:
-			if  c.ticked:
-				c.reset()
-		ticked = false
-		return
-	
 	func tick() -> int:
 		ticked = true
 		if  status.status != Status.RUNNING:
@@ -111,14 +100,6 @@ class Paralel extends TNode:
 		return status.status
 
 class PSelector extends TNode:
-	func reset():
-		status.reset()
-		for c in children:
-			if  c.ticked:
-				c.reset()
-		ticked = false
-		return
-	
 	func tick()->int:
 		ticked = true
 		if  status.status != Status.RUNNING:
@@ -161,15 +142,6 @@ class PCondition extends TNode:
 		status.params = data.get('values', [])
 		return
 	
-	func reset():
-		status.reset()
-		if  not children.empty():
-			var c = children.front()
-			if  c != null and c.ticked:
-				c.reset()
-		ticked = false
-		return
-	
 	func tick()->int:
 		ticked = true
 		if  children.empty():
@@ -179,15 +151,6 @@ class PCondition extends TNode:
 		return status.status
 
 class Root extends TNode:
-	func reset():
-		status.reset()
-		if  not children.empty():
-			var c = children.front()
-			if  c != null and c.ticked:
-				c.reset()
-		ticked = false
-		return
-	
 	func tick()->int:
 		ticked = true
 		if  status.status != Status.RUNNING:
@@ -208,11 +171,6 @@ class Task extends TNode:
 		status.params = data.get('values', [])
 		return
 	
-	func reset():
-		status.reset()
-		ticked = false
-		return
-	
 	func tick()->int:
 		ticked = true
 		if  status.status != Status.RUNNING:
@@ -224,12 +182,8 @@ class Sequence extends TNode:
 	var current_child = 0
 	
 	func reset():
-		status.reset()
+		.reset()
 		current_child = 0
-		for c in children:
-			if  c.ticked:
-				c.reset()
-		ticked = false
 		return
 	
 	func tick()->int:
@@ -261,12 +215,8 @@ class Selector extends TNode:
 	var current_child = 0
 
 	func reset():
-		status.reset()
+		.reset()
 		current_child = 0
-		for c in children:
-			if  c.ticked:
-				c.reset()
-		ticked = false
 		return
 
 	func tick()->int:
@@ -295,15 +245,6 @@ class RandomSelector extends Selector:
 		return
 
 class Mute extends TNode:
-	func reset():
-		status.reset()
-		if  not children.empty():
-			var c = children.front()
-			if  c != null and c.ticked:
-				c.reset()
-		ticked = false
-		return
-	
 	func tick()->int:
 		ticked = true
 		if  status.status != Status.RUNNING:
@@ -317,15 +258,6 @@ class Mute extends TNode:
 		return status.status
 
 class Inverter extends TNode:
-	func reset():
-		status.reset()
-		if  not children.empty():
-			var c = children.front()
-			if  c != null and c.ticked:
-				c.reset()
-		ticked = false
-		return
-	
 	func tick()->int:
 		ticked = true
 		if  status.status != Status.RUNNING:
@@ -353,13 +285,8 @@ class Repeat extends TNode:
 		return
 	
 	func reset():
+		.reset()
 		tick_count = count
-		status.reset()
-		if  not children.empty():
-			var c = children.front()
-			if  c != null and c.ticked:
-				c.reset()
-		ticked = false
 		return
 	
 	func tick()->int:
@@ -395,15 +322,6 @@ class WhileNode extends TNode:
 		status.params = data.get('values', [])
 		return
 	
-	func reset():
-		status.reset()
-		if  not children.empty():
-			var c = children.front()
-			if  c != null and c.ticked:
-				c.reset()
-		ticked = false
-		return
-	
 	func tick() -> int:
 		ticked = true
 		if  status.status != Status.RUNNING:
@@ -428,9 +346,8 @@ class WaitNode extends TNode:
 		return
 	
 	func reset():
+		.reset()
 		tick_count = count
-		status.reset()
-		ticked = false
 		return
 	
 	func tick()->int:
