@@ -31,7 +31,6 @@ class Status:
 
 class TNode:
 	var status = Status.new()
-	var children = Array()
 	var ticked = false
 	
 	func setup(data: Dictionary, target):
@@ -39,16 +38,32 @@ class TNode:
 	
 	func reset():
 		status.reset()
-		for c in children:
-			if  c.ticked:
-				c.reset()
 		ticked = false
 		return
 	
 	func tick() -> int:
 		return Status.RUNNING
 
-class Race extends TNode:
+class CompositeTNode extends TNode:
+	var children = []
+	
+	func reset():
+		.reset()
+		for c in children:
+			if  c.ticked:
+				c.reset()
+		return
+
+class DecoratorTNode extends TNode:
+	var child : TNode
+	
+	func reset():
+		.reset()
+		if child and child.ticked:
+			child.reset()
+		return
+
+class Race extends CompositeTNode:
 	func tick() -> int:
 		ticked = true
 		if  status.status != Status.RUNNING:
@@ -74,7 +89,7 @@ class Race extends TNode:
 			return status.status
 		return status.status
 
-class Paralel extends TNode:
+class Paralel extends CompositeTNode:
 	func tick() -> int:
 		ticked = true
 		if  status.status != Status.RUNNING:
@@ -99,8 +114,8 @@ class Paralel extends TNode:
 			status.succeed()
 		return status.status
 
-class PSelector extends TNode:
-	func tick()->int:
+class PSelector extends CompositeTNode:
+	func tick() -> int:
 		ticked = true
 		if  status.status != Status.RUNNING:
 			return status.status
@@ -112,7 +127,7 @@ class PSelector extends TNode:
 			if  r == Status.FAILED:
 				continue
 			if  r == Status.SUCCEED:
-				var cr = c.children.front().tick()
+				var cr = c.child.tick()
 				if  cr == Status.FAILED:
 					continue
 				if  cr == Status.RUNNING:
@@ -132,7 +147,7 @@ class PConditionStatus extends Status:
 		status = Status.FAILED
 		return
 
-class PCondition extends TNode:
+class PCondition extends DecoratorTNode:
 	var target = null
 
 	func setup(data: Dictionary, target):
@@ -142,25 +157,25 @@ class PCondition extends TNode:
 		status.params = data.get('values', [])
 		return
 	
-	func tick()->int:
+	func tick() -> int:
 		ticked = true
-		if  children.empty():
+		if not child:
 			status.failed()
 			return status.status
 		target.call_func(status)
 		return status.status
 
-class Root extends TNode:
-	func tick()->int:
+class Root extends DecoratorTNode:
+	func tick() -> int:
 		ticked = true
 		if  status.status != Status.RUNNING:
 			return status.status
 		
-		if  children.empty():
+		if  not child:
 			status.failed()
 			return status.status
 		
-		return children.front().tick()
+		return child.tick()
 
 class Task extends TNode:
 	var target = null
@@ -171,14 +186,14 @@ class Task extends TNode:
 		status.params = data.get('values', [])
 		return
 	
-	func tick()->int:
+	func tick() -> int:
 		ticked = true
 		if  status.status != Status.RUNNING:
 			return status.status
 		target.call_func(status)
 		return status.status
 
-class Sequence extends TNode:
+class Sequence extends CompositeTNode:
 	var current_child = 0
 	
 	func reset():
@@ -186,7 +201,7 @@ class Sequence extends TNode:
 		current_child = 0
 		return
 	
-	func tick()->int:
+	func tick() -> int:
 		ticked = true
 		if  status.status != Status.RUNNING:
 			return status.status
@@ -211,7 +226,7 @@ class RandomSequence extends Sequence:
 		children.shuffle()
 		return
 
-class Selector extends TNode:
+class Selector extends CompositeTNode:
 	var current_child = 0
 
 	func reset():
@@ -219,7 +234,7 @@ class Selector extends TNode:
 		current_child = 0
 		return
 
-	func tick()->int:
+	func tick() -> int:
 		ticked = true
 		if  status.status != Status.RUNNING:
 			return status.status
@@ -244,28 +259,24 @@ class RandomSelector extends Selector:
 		children.shuffle()
 		return
 
-class Mute extends TNode:
-	func tick()->int:
+class Mute extends DecoratorTNode:
+	func tick() -> int:
 		ticked = true
 		if  status.status != Status.RUNNING:
 			return status.status
-		if  children.empty():
-			status.succeed()
-			return status.status
-		var r = children.front().tick()
-		if  r != Status.RUNNING:
+		if  not child or child.tick() != Status.RUNNING:
 			status.succeed()
 		return status.status
 
-class Inverter extends TNode:
-	func tick()->int:
+class Inverter extends DecoratorTNode:
+	func tick() -> int:
 		ticked = true
 		if  status.status != Status.RUNNING:
 			return status.status
-		if  children.empty():
+		if  not child:
 			status.succeed()
 			return status.status
-		var r = children.front().tick()
+		var r = child.tick()
 		if  r != Status.RUNNING:
 			if  r == Status.SUCCEED:
 				status.failed()
@@ -274,7 +285,7 @@ class Inverter extends TNode:
 		return status.status
 
 
-class Repeat extends TNode:
+class Repeat extends DecoratorTNode:
 	var tick_count = 0
 	var count = 0
 	
@@ -289,19 +300,19 @@ class Repeat extends TNode:
 		tick_count = count
 		return
 	
-	func tick()->int:
+	func tick() -> int:
 		ticked = true
 		if  count > 0 and tick_count == 0:
 			status.succeed()
 			return status.status
 		if  status.status != Status.RUNNING:
 			return status.status
-		if  children.empty():
+		if  not child:
 			status.succeed()
 			return status.status
-		var result = children.front().tick()
+		var result = child.tick()
 		if  result == Status.SUCCEED:
-			children.front().reset()
+			child.reset()
 			if  count > 0:
 				tick_count -= 1
 				if  tick_count == 0:
@@ -313,7 +324,7 @@ class Repeat extends TNode:
 			return status.status
 		return status.status
 
-class WhileNode extends TNode:
+class WhileNode extends DecoratorTNode:
 	var target = null
 	
 	func setup(data: Dictionary, target):
@@ -326,13 +337,13 @@ class WhileNode extends TNode:
 		ticked = true
 		if  status.status != Status.RUNNING:
 			return status.status
-		if  children.empty():
+		if  not child:
 			status.failed()
 			return status.status
 		status.failed()
 		target.call_func(status)
 		if  status.status == Status.SUCCEED:
-			status.status = children.front().tick()
+			status.status = child.tick()
 		return status.status
 
 class WaitNode extends TNode:
@@ -350,7 +361,7 @@ class WaitNode extends TNode:
 		tick_count = count
 		return
 	
-	func tick()->int:
+	func tick() -> int:
 		ticked = true
 		if  tick_count <= 0:
 			status.succeed()
@@ -404,18 +415,20 @@ static func get_constructors() -> Dictionary:
 	return constructors
 
 static func create_runtime(data:Dictionary, target) -> TNode:
-	if  data.empty():
+	if data.empty():
 		return null
-	var current = null
-	var t_node_type = get_constructors().get(data.type)
-	if t_node_type != null:
-		current = t_node_type.new()
-		current.setup(data.data, target)
+
 	if data.type == TNodeTypes.MINIM:
-		current = create_runtime(data.data.data.root, target)
-	if  current:
-		for child in data.child:
-			var tnode = create_runtime(child, target)
-			if  tnode:
-				current.children.append(tnode)
+		return create_runtime(data.data.data.root, target)
+
+	var tnode_type = get_constructors().get(data.type)
+	var current : TNode = tnode_type.new()
+	current.setup(data.data, target)
+
+	for child in data.child:
+		var tnode_child = create_runtime(child, target)
+		if current is CompositeTNode:
+			current.children.append(tnode_child)
+		elif current is DecoratorTNode:
+			current.child = tnode_child
 	return current
