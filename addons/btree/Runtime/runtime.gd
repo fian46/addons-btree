@@ -8,17 +8,17 @@ class Status:
 	const SUCCEED = 1
 	const FAILED = -1
 	
-	func reset():
+	func reset() -> int:
 		status = RUNNING
-		return
+		return status
 	
-	func succeed():
+	func succeed() -> int:
 		status = SUCCEED
-		return
+		return status
 	
-	func failed():
+	func failed() -> int:
 		status = FAILED
-		return
+		return status
 	
 	func get_status():
 		return status
@@ -55,7 +55,7 @@ class CompositeTNode extends TNode:
 		return
 
 class DecoratorTNode extends TNode:
-	var child : TNode
+	var child: TNode
 	
 	func reset():
 		.reset()
@@ -69,8 +69,7 @@ class Race extends CompositeTNode:
 		if  status.status != Status.RUNNING:
 			return status.status
 		if  children.empty():
-			status.succeed()
-			return status.status
+			return status.succeed()
 		var fcount = 0
 		for c in children:
 			var pr = c.status.status
@@ -80,13 +79,11 @@ class Race extends CompositeTNode:
 				r = c.tick()
 			
 			if  r == Status.SUCCEED:
-				status.succeed()
-				return status.status
+				return status.succeed()
 			elif r == Status.FAILED:
 				fcount += 1
 		if  fcount == children.size():
-			status.failed()
-			return status.status
+			return status.failed()
 		return status.status
 
 class Paralel extends CompositeTNode:
@@ -96,8 +93,7 @@ class Paralel extends CompositeTNode:
 			return status.status
 		
 		if  children.empty():
-			status.succeed()
-			return status.status
+			return status.succeed()
 		
 		var scount = 0
 		for c in children:
@@ -108,8 +104,7 @@ class Paralel extends CompositeTNode:
 			if  r == Status.SUCCEED:
 				scount += 1
 			if  r == Status.FAILED:
-				status.failed()
-				return status.status
+				return status.failed()
 		if  scount == children.size():
 			status.succeed()
 		return status.status
@@ -120,8 +115,7 @@ class PSelector extends CompositeTNode:
 		if  status.status != Status.RUNNING:
 			return status.status
 		if  children.empty():
-			status.failed()
-			return status.status
+			return status.failed()
 		for c in children:
 			var r = c.tick()
 			if  r == Status.FAILED:
@@ -133,19 +127,17 @@ class PSelector extends CompositeTNode:
 				if  cr == Status.RUNNING:
 					return status.status
 				if  cr == Status.SUCCEED:
-					status.succeed()
-					return status.status
-		status.failed()
-		return status.status
+					return status.succeed()
+		return status.failed()
 
 class PConditionStatus extends Status:
 	func _init():
 		reset()
 		return
 	
-	func reset():
+	func reset() -> int:
 		status = Status.FAILED
-		return
+		return status
 
 class PCondition extends DecoratorTNode:
 	var target = null
@@ -160,8 +152,7 @@ class PCondition extends DecoratorTNode:
 	func tick() -> int:
 		ticked = true
 		if not child:
-			status.failed()
-			return status.status
+			return status.failed()
 		target.call_func(status)
 		return status.status
 
@@ -172,8 +163,7 @@ class Root extends DecoratorTNode:
 			return status.status
 		
 		if  not child:
-			status.failed()
-			return status.status
+			return status.failed()
 		
 		return child.tick()
 
@@ -206,8 +196,7 @@ class Sequence extends CompositeTNode:
 		if  status.status != Status.RUNNING:
 			return status.status
 		if  children.empty():
-			status.succeed()
-			return status.status
+			return status.succeed()
 		for i in range(current_child, children.size()):
 			current_child = i
 			var c = children[i]
@@ -215,10 +204,8 @@ class Sequence extends CompositeTNode:
 			if  r == Status.RUNNING:
 				return status.status
 			elif r == Status.FAILED:
-				status.failed()
-				return status.status
-		status.succeed()
-		return status.status
+				return status.failed()
+		return status.succeed()
 
 class RandomSequence extends Sequence:
 	func reset():
@@ -239,8 +226,7 @@ class Selector extends CompositeTNode:
 		if  status.status != Status.RUNNING:
 			return status.status
 		if  children.empty():
-			status.succeed()
-			return status.status
+			return status.succeed()
 		for i in range(current_child, children.size()):
 			current_child = i
 			var c = children[i]
@@ -248,10 +234,8 @@ class Selector extends CompositeTNode:
 			if  r == Status.RUNNING:
 				return status.status
 			elif r == Status.SUCCEED:
-				status.succeed()
-				return status.status
-		status.failed()
-		return status.status
+				return status.succeed()
+		return status.failed()
 
 class RandomSelector extends Selector:
 	func reset():
@@ -265,7 +249,7 @@ class Mute extends DecoratorTNode:
 		if  status.status != Status.RUNNING:
 			return status.status
 		if  not child or child.tick() != Status.RUNNING:
-			status.succeed()
+			return status.succeed()
 		return status.status
 
 class Inverter extends DecoratorTNode:
@@ -274,8 +258,7 @@ class Inverter extends DecoratorTNode:
 		if  status.status != Status.RUNNING:
 			return status.status
 		if  not child:
-			status.succeed()
-			return status.status
+			return status.succeed()
 		var r = child.tick()
 		if  r != Status.RUNNING:
 			if  r == Status.SUCCEED:
@@ -303,13 +286,11 @@ class Repeat extends DecoratorTNode:
 	func tick() -> int:
 		ticked = true
 		if  count > 0 and tick_count == 0:
-			status.succeed()
-			return status.status
+			return status.succeed()
 		if  status.status != Status.RUNNING:
 			return status.status
 		if  not child:
-			status.succeed()
-			return status.status
+			return status.succeed()
 		var result = child.tick()
 		if  result == Status.SUCCEED:
 			child.reset()
@@ -320,8 +301,7 @@ class Repeat extends DecoratorTNode:
 			return status.status
 		
 		if  result == Status.FAILED:
-			status.failed()
-			return status.status
+			return status.failed()
 		return status.status
 
 class WhileNode extends DecoratorTNode:
@@ -338,8 +318,7 @@ class WhileNode extends DecoratorTNode:
 		if  status.status != Status.RUNNING:
 			return status.status
 		if  not child:
-			status.failed()
-			return status.status
+			return status.failed()
 		status.failed()
 		target.call_func(status)
 		if  status.status == Status.SUCCEED:
@@ -364,8 +343,7 @@ class WaitNode extends TNode:
 	func tick() -> int:
 		ticked = true
 		if  tick_count <= 0:
-			status.succeed()
-			return status.status
+			return status.succeed()
 		if  status.status != Status.RUNNING:
 			return status.status
 		tick_count -= 1
