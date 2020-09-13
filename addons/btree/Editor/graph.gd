@@ -4,9 +4,15 @@ extends GraphEdit
 var data = null
 var root_object = null
 var control = null
+export(NodePath) var hint_path:NodePath
+export(NodePath) var debugger_path:NodePath
 
 func _ready():
 	set_process_input(true)
+	return
+
+func hint(value):
+	get_node(hint_path).text = value
 	return
 
 func reload():
@@ -58,7 +64,7 @@ var general_fcall_class = preload("res://addons/btree/Editor/general_fcall/gener
 var minim_scene = preload("res://addons/btree/Editor/minim_node/minim_node.tscn")
 var inverter_scene = preload("res://addons/btree/Editor/inverter/inverter.tscn")
 
-const Runtime = preload('../Runtime/runtime.gd')
+const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
 
 func build_tree_from_data():
 	if  not data:
@@ -190,9 +196,9 @@ func child_delete(node):
 
 func _on_save_pressed():
 	if  not data:
-		get_parent().hint("No BTREE selected !")
+		hint("No BTREE selected !")
 		return
-	get_parent().hint("Saving Data")
+	hint("Saving Data")
 	data.tree = {}
 	var info = data.tree
 	info.nodes = []
@@ -250,44 +256,50 @@ func slot_removed(name, slot):
 			disconnect_node(i.from, i.from_port, i.to, i.to_port)
 	return
 
-func _input(event):
+func gui_input(event):
 	if  not is_visible_in_tree():
 		return
 
 	if  event is InputEventKey:
 		if  event.scancode == KEY_M and not event.pressed and event.control and event.shift:
 			minimize_node()
-			get_parent().hint("Node Minimized")
+			hint("Node Minimized")
+			accept_event()
 
 		if  event.scancode == KEY_C and not event.pressed and event.control and event.shift:
 			copy_node()
-			get_parent().hint("Recursive Duplicate Node")
+			hint("Recursive Duplicate Node")
+			accept_event()
 
 		if  event.scancode == KEY_X and not event.pressed and event.control and event.shift:
 			rdelete_node()
-			get_parent().hint("Recursive Delete Node")
+			hint("Recursive Delete Node")
+			accept_event()
 
 		if  event.scancode == KEY_SPACE and event.pressed and event.control and event.shift:
 			rmove_node()
-			get_parent().hint("Recursive Move Node")
+			hint("Recursive Move Node")
+			accept_event()
 
 		if  event.scancode == KEY_S and not event.pressed and event.control:
 			_on_save_pressed()
+			accept_event()
 
 		if  event.scancode == KEY_F  and not event.pressed and event.control:
 			focus_selected()
+			accept_event()
 		return
 
 	if  event is InputEventMouseButton:
-		if  event.pressed and event.button_index == 4 and event.control and event.shift:
+		if  event.button_index == 4 and event.control and event.shift:
 			zoom += 0.1
 			accept_event()
-			get_parent().hint("Zoom In")
+			hint("Zoom In")
 			return
-		if  event.pressed and event.button_index == 5 and event.control and event.shift:
+		if  event.button_index == 5 and event.control and event.shift:
 			zoom -= 0.1
 			accept_event()
-			get_parent().hint("Zoom Out")
+			hint("Zoom Out")
 			return
 	return
 
@@ -295,13 +307,13 @@ var selected:Node
 
 func copy_node():
 	if  not selected:
-		get_parent().hint("No Node Selected")
+		hint("No Node Selected")
 		return
 	if  not selected.selected:
-		get_parent().hint("No Node Selected")
+		hint("No Node Selected")
 		return
 	if  selected.name == "root":
-		get_parent().hint("Cannot Duplicate \"root\" Node !")
+		hint("Cannot Duplicate \"root\" Node !")
 		return
 
 	var root_offset = (scroll_offset / zoom) + (get_local_mouse_position() / zoom)
@@ -352,16 +364,16 @@ var minim_class = preload("res://addons/btree/Editor/minim_node/minim_node.gd")
 
 func minimize_node():
 	if  not selected:
-		get_parent().hint("No Node Selected")
+		hint("No Node Selected")
 		return
 	if  not selected.selected:
-		get_parent().hint("No Node Selected")
+		hint("No Node Selected")
 		return
 	if  selected is minim_class:
-		get_parent().hint("Cannot Minimize \"Minimize\" Node !")
+		hint("Cannot Minimize \"Minimize\" Node !")
 		return
 	if  selected.name == "root":
-		get_parent().hint("Cannot Minimize \"root\" Node !")
+		hint("Cannot Minimize \"root\" Node !")
 		return
 	var soffset = selected.offset
 	var m_inst = minim_scene.instance()
@@ -476,13 +488,13 @@ func maximize_node(minim):
 
 func rdelete_node():
 	if  not selected:
-		get_parent().hint("No Node Selected")
+		hint("No Node Selected")
 		return
 	if  not selected.selected:
-		get_parent().hint("No Node Selected")
+		hint("No Node Selected")
 		return
 	if  selected.name == "root":
-		get_parent().hint("Cannot Delete \"root\" Node")
+		hint("Cannot Delete \"root\" Node")
 		return
 
 	var nodes = []
@@ -515,10 +527,10 @@ func rdelete_node():
 func rmove_node():
 	var root_offset = (scroll_offset / zoom) + (get_local_mouse_position() / zoom)
 	if  not selected:
-		get_parent().hint("No Node Selected")
+		hint("No Node Selected")
 		return
 	if  not selected.selected:
-		get_parent().hint("No Node Selected")
+		hint("No Node Selected")
 		return
 
 	var nodes = []
@@ -567,10 +579,6 @@ func focus_selected():
 	scroll_offset = selected.offset * zoom - ((rect_size / 2) - (selected.rect_size / 2))
 	return
 
-func _on_help_toggled(button_pressed):
-	get_parent().help(button_pressed)
-	return
-
 func _on_search_bar_text_changed(new_text):
 	var most_similar:Node = null
 	for i in get_children():
@@ -590,6 +598,16 @@ func _on_search_bar_text_changed(new_text):
 		scroll_offset = most_similar.offset * zoom - ((rect_size / 2) - (most_similar.rect_size / 2))
 	return
 
+export(NodePath) var create_path
+
 func popup_request(position):
-	$group/Create.get_popup().popup(Rect2(position, Vector2(1, 1)))
+	get_node(create_path).get_popup().popup(Rect2(position, Vector2(1, 1)))
+	return
+
+func _on_debug_pressed():
+	get_node(debugger_path).popup_centered()
+	return
+
+func _on_help_pressed():
+	get_parent().get_parent().help()
 	return

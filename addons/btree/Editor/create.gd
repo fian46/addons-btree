@@ -12,11 +12,12 @@ var wait_scene = preload("res://addons/btree/Editor/wait_node/wait_node.tscn")
 var general_fcall_scene = preload("res://addons/btree/Editor/general_fcall/general_fcall.tscn")
 var general_decorator_scene = preload("res://addons/btree/Editor/general_decorator/general_decorator.tscn")
 var inverter = preload("res://addons/btree/Editor/inverter/inverter.tscn")
-
 var pop_pos = Vector2.ZERO
+export(NodePath) var graph_path:NodePath
 
 func id_pressed(id):
-	var zoom =  get_parent().get_parent().zoom
+	var graph = get_node(graph_path)
+	var zoom =  graph.zoom
 	var inst = null
 	match id:
 		Runtime.TNodeTypes.TASK: 
@@ -56,8 +57,8 @@ func id_pressed(id):
 			inst.as_random_sequence()
 		Runtime.TNodeTypes.INVERTER:
 			inst = inverter.instance()
-	inst.offset = (get_parent().get_parent().scroll_offset / zoom) + (get_parent().get_parent().get_local_mouse_position() / zoom)
-	get_parent().get_parent().add_child(inst)
+	inst.offset = (graph.scroll_offset / zoom) + (graph.get_local_mouse_position() / zoom)
+	graph.add_child(inst)
 	return
 
 func _ready():

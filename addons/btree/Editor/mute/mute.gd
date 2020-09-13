@@ -1,7 +1,7 @@
 tool
 extends GraphNode
 
-const Runtime = preload('../../Runtime/runtime.gd')
+const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
 
 const type = Runtime.TNodeTypes.MUTE
 
