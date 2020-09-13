@@ -1,20 +1,24 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://addons/btree/Editor/test.gd" type="Script" id=1]
-[ext_resource path="res://addons/btree/Editor/TreeEditor.tscn" type="PackedScene" id=2]
+[ext_resource path="res://addons/btree/Editor/editor.tscn" type="PackedScene" id=2]
+[ext_resource path="res://addons/btree/Editor/help.tscn" type="PackedScene" id=3]
 
-[node name="Control" type="Panel"]
+[node name="test" type="Panel"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="TreeEditor" parent="." instance=ExtResource( 2 )]
+[node name="editor" parent="." instance=ExtResource( 2 )]
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Label" type="Label" parent="."]
+[node name="halt" type="Label" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 0
@@ -26,30 +30,4 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="hint" type="VBoxContainer" parent="."]
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_vertical = 0
-mouse_filter = 2
-alignment = 2
-
-[node name="help" type="VBoxContainer" parent="."]
-visible = false
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 2
-alignment = 1
-
-[node name="Label" type="Label" parent="help"]
-margin_top = 122.0
-margin_right = 640.0
-margin_bottom = 238.0
-text = "Control + F = Focus to selected node
-Control + S = Save
-Control + Shift + Mouse Scroll = Zoom In/Out
-(Select a node) and Control + Shift + C = Duplicate Recursive
-(Select a node) and Control + Shift + X = Delete Recursive
-(Select a node) and Control + Shift + Space = Move Recursive
-(Select a node)  and Control + Shift + M = Minimize Node"
-align = 1
-valign = 1
+[node name="help" parent="." instance=ExtResource( 3 )]

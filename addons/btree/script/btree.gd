@@ -1,6 +1,6 @@
 extends Node
 
-const Runtime = preload("../Runtime/runtime.gd")
+const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
 
 export(Dictionary) var tree = {}
 export(bool) var enable = true
@@ -9,7 +9,8 @@ var rtree: Runtime.TNode = null
 
 func _enter_tree():
 	rtree = Runtime.create_runtime(tree.get('root', {}), get_parent())
-
+	BTDebugServer.register_instance(get_parent())
+	return
 
 func _process(delta):
 	if run_on == 0:
@@ -22,10 +23,25 @@ func _physics_process(delta):
 		btree_process(delta)
 	return
 
-
 func btree_process(_delta):
 	if  not enable or not rtree:
 		return
-	if rtree.tick() != Runtime.Status.RUNNING:
+	tick()
+	return
+
+var debug
+
+func tick():
+	var status = rtree.tick()
+	flush()
+	if  status != Runtime.Status.RUNNING:
 		rtree.reset()
+		flush()
+	return
+
+func flush():
+	if  debug:
+		var ref = debug.get_ref()
+		if  ref:
+			ref.flush(self)
 	return

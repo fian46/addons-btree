@@ -7,6 +7,7 @@ enum Status {
 }
 
 class TNode:
+	var name:String
 	var status: int = Status.RUNNING
 	var ticked := false
 	
@@ -98,13 +99,23 @@ class Paralel extends CompositeTNode:
 		return status
 
 class PSelector extends CompositeTNode:
+	
+	var current_child = 0
+	
+	func reset():
+		.reset()
+		current_child = 0
+		return
+	
 	func tick() -> int:
 		ticked = true
 		if  status != Status.RUNNING:
 			return status
 		if  children.empty():
 			return failed()
-		for c in children:
+		for i in range(current_child, children.size()):
+			current_child = i
+			var c = children[i]
 			var r = c.tick()
 			if  r == Status.FAILED:
 				continue
@@ -289,9 +300,10 @@ class Repeat extends DecoratorTNode:
 			return status
 		if  not child:
 			return succeed()
+		if  child.status == Status.SUCCEED:
+			child.reset()
 		var result = child.tick()
 		if  result == Status.SUCCEED:
-			child.reset()
 			if  count > 0:
 				tick_count -= 1
 				if  tick_count == 0:
@@ -351,7 +363,7 @@ class WaitNode extends TNode:
 			return succeed()
 		if  status != Status.RUNNING:
 			return status
-		tick_count -= 1
+		tick_count -= Engine.time_scale
 		if  tick_count <= 0:
 			succeed()
 		return status
@@ -405,6 +417,7 @@ static func create_runtime(data: Dictionary, target) -> TNode:
 
 	var tnode_type = get_constructors().get(data.type)
 	var current: TNode = tnode_type.new()
+	current.name = data.name
 	current.setup(data.data, target)
 
 	for child in data.child:
