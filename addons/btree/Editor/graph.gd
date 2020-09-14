@@ -195,6 +195,8 @@ func child_delete(node):
 	return
 
 func _on_save_pressed():
+	if  not is_visible_in_tree():
+		return
 	if  not data:
 		hint("No BTREE selected !")
 		return
@@ -209,7 +211,7 @@ func _on_save_pressed():
 			node["type"] = i.type
 			node["data"] = i.get_data()
 			info.nodes.append(node)
-
+	
 	var root = find("root", info.nodes)
 	build_tree(root, get_connection_list(), info.nodes)
 	info.root = root
