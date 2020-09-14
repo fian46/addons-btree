@@ -32,6 +32,19 @@ func btree_process(_delta):
 var debug
 
 func tick():
+	if  debug and debug.get_ref():
+		var ref = debug.get_ref()
+		if  not ref.paused:
+			_tick()
+		else:
+			if  ref.step:
+				ref.step = false
+				_tick()
+	else:
+		_tick()
+	return
+
+func _tick():
 	var status = rtree.tick()
 	flush()
 	if  status != Runtime.Status.RUNNING:
