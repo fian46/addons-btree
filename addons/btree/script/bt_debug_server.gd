@@ -8,6 +8,8 @@ var btree_script:GDScript = preload("res://addons/btree/script/btree.gd")
 var queue = []
 var send_tree = false
 var selected_instance
+var paused = false
+var step = false
 
 func _ready():
 	server = WebSocketServer.new()
@@ -23,18 +25,26 @@ func client_data(id):
 	if  msg.type == 0:
 		send_tree = msg.visible
 		if  not send_tree:
+			paused = false
+			step = false
 			if  selected_instance:
 				selected_instance.debug = null
 				selected_instance = null
 	elif msg.type == 1:
 		var new_instance = instance_from_id(msg.instance_id)
 		if  selected_instance != new_instance:
+			paused = false
+			step = false
 			if  selected_instance:
 				selected_instance.debug = null
 			selected_instance = new_instance
 			if  selected_instance:
 				selected_instance.debug = weakref(self)
 				flush(selected_instance)
+	elif msg.type == 2:
+		paused = msg.paused
+	elif msg.type == 3:
+		step = msg.step
 	return
 
 func debug_detached(id, was_clean):

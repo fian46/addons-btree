@@ -28,7 +28,32 @@ func queue_update(msg):
 	queue.append(msg)
 	return
 
+var step = false
+var pause = false
+
 func _process(delta):
+	if  pause:
+		var msg = {}
+		msg.type = 2
+		msg.paused = true
+		write(msg)
+	else:
+		var msg = {}
+		msg.type = 2
+		msg.paused = false
+		write(msg)
+	
+	if step:
+		var msg = {}
+		msg.type = 3
+		msg.step = true
+		write(msg)
+	else:
+		var msg = {}
+		msg.type = 3
+		msg.step = false
+		write(msg)
+
 	if  queue.size() > 20:
 		while queue.size() > 1:
 			update_graph()
@@ -41,6 +66,8 @@ func update_graph():
 		return
 	var msg = queue.pop_front()
 	if  version != msg.version:
+		pause = false
+		step = false
 		version = msg.version
 		generate_tree(msg.payload)
 		update_state(msg.payload)
@@ -185,6 +212,7 @@ func error():
 	return
 
 func start_debug():
+	$layout/hbox3.visible = true
 	var tree = $layout/split/rtree
 	var selected = tree.get_selected()
 	if  bt_id.has(selected):
@@ -194,11 +222,24 @@ func start_debug():
 		write(msg)
 
 func stop_debug():
-	queue.clear()
+	$layout/hbox3.visible = false
 	var graph = $layout/split/debug_graph
+	queue.clear()
 	clear_editor(graph)
 	var msg = {}
 	msg.type = 1
 	msg.instance_id = -1
 	write(msg)
+	return
+
+func _on_pause_pressed():
+	pause = not pause
+	return
+
+func _on_step_button_down():
+	step = true
+	return
+
+func _on_step_button_up():
+	step = false
 	return

@@ -49,11 +49,11 @@ text = "Help"
 [node name="graph" type="GraphEdit" parent="."]
 margin_top = 24.0
 margin_right = 640.0
-margin_bottom = 332.0
+margin_bottom = 24.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 right_disconnects = true
-scroll_offset = Vector2( 0, -96 )
+scroll_offset = Vector2( -20, 0 )
 script = ExtResource( 5 )
 hint_path = NodePath("../footer/hint")
 debugger_path = NodePath("../rtree")
@@ -62,18 +62,18 @@ create_path = NodePath("../group/create")
 [node name="root" parent="graph" instance=ExtResource( 2 )]
 anchor_top = 0.5
 anchor_bottom = 0.5
-margin_top = -58.0
-margin_right = 60.0
-margin_bottom = 2.0
+margin_left = 20.0
+margin_right = 80.0
+margin_bottom = 60.0
 mouse_filter = 1
 size_flags_horizontal = 3
 size_flags_vertical = 3
 title = "root"
 
 [node name="footer" type="HBoxContainer" parent="."]
-margin_top = 336.0
+margin_top = 28.0
 margin_right = 640.0
-margin_bottom = 360.0
+margin_bottom = 52.0
 alignment = 1
 __meta__ = {
 "_edit_use_anchors_": false
@@ -107,10 +107,11 @@ caret_blink = true
 caret_blink_speed = 0.5
 
 [node name="rtree" type="WindowDialog" parent="."]
-margin_top = 208.0
+visible = true
+margin_top = 56.0
 margin_right = 640.0
-margin_bottom = 360.0
-rect_min_size = Vector2( 720, 720 )
+margin_bottom = 456.0
+rect_min_size = Vector2( 400, 400 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
 popup_exclusive = true
@@ -143,14 +144,14 @@ text = "Select a BTREE : "
 [node name="split" type="HSplitContainer" parent="rtree/layout"]
 margin_top = 18.0
 margin_right = 640.0
-margin_bottom = 152.0
+margin_bottom = 376.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 split_offset = 200
 
 [node name="rtree" type="Tree" parent="rtree/layout/split"]
 margin_right = 201.0
-margin_bottom = 134.0
+margin_bottom = 358.0
 size_flags_vertical = 3
 __meta__ = {
 "_edit_use_anchors_": false
@@ -159,8 +160,27 @@ __meta__ = {
 [node name="debug_graph" type="GraphEdit" parent="rtree/layout/split"]
 margin_left = 213.0
 margin_right = 640.0
-margin_bottom = 134.0
+margin_bottom = 358.0
+scroll_offset = Vector2( -80, -320 )
 script = ExtResource( 6 )
+
+[node name="hbox3" type="HBoxContainer" parent="rtree/layout"]
+margin_top = 380.0
+margin_right = 640.0
+margin_bottom = 400.0
+alignment = 2
+
+[node name="pause" type="Button" parent="rtree/layout/hbox3"]
+margin_left = 532.0
+margin_right = 595.0
+margin_bottom = 20.0
+text = "PAUSED"
+
+[node name="step" type="Button" parent="rtree/layout/hbox3"]
+margin_left = 599.0
+margin_right = 640.0
+margin_bottom = 20.0
+text = "STEP"
 [connection signal="pressed" from="group/save" to="graph" method="_on_save_pressed"]
 [connection signal="pressed" from="group/debug" to="graph" method="_on_debug_pressed"]
 [connection signal="pressed" from="group/help" to="graph" method="_on_help_pressed"]
@@ -174,3 +194,6 @@ script = ExtResource( 6 )
 [connection signal="popup_hide" from="rtree" to="rtree" method="_on_rtree_popup_hide"]
 [connection signal="item_selected" from="rtree/layout/split/rtree" to="rtree" method="_on_rtree_item_selected"]
 [connection signal="gui_input" from="rtree/layout/split/debug_graph" to="rtree/layout/split/debug_graph" method="gui_input"]
+[connection signal="pressed" from="rtree/layout/hbox3/pause" to="rtree" method="_on_pause_pressed"]
+[connection signal="button_down" from="rtree/layout/hbox3/step" to="rtree" method="_on_step_button_down"]
+[connection signal="button_up" from="rtree/layout/hbox3/step" to="rtree" method="_on_step_button_up"]
