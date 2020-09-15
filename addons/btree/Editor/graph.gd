@@ -4,6 +4,7 @@ extends GraphEdit
 var data = null
 var root_object = null
 var control = null
+var active = false
 export(NodePath) var hint_path:NodePath
 export(NodePath) var debugger_path:NodePath
 
@@ -195,7 +196,8 @@ func child_delete(node):
 	return
 
 func _on_save_pressed():
-	if  not is_visible_in_tree():
+	if  not active:
+		print("BT Editor Skip Saving Data")
 		return
 	if  not data:
 		hint("No BTREE selected !")
@@ -283,10 +285,6 @@ func gui_input(event):
 			hint("Recursive Move Node")
 			accept_event()
 
-		if  event.scancode == KEY_S and not event.pressed and event.control:
-			_on_save_pressed()
-			accept_event()
-
 		if  event.scancode == KEY_F  and not event.pressed and event.control:
 			focus_selected()
 			accept_event()
@@ -303,6 +301,12 @@ func gui_input(event):
 			accept_event()
 			hint("Zoom Out")
 			return
+	return
+
+func _input(event):
+	if  event is InputEventKey and event.scancode == KEY_S and not event.pressed and event.control:
+		_on_save_pressed()
+		accept_event()
 	return
 
 var selected:Node
