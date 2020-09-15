@@ -109,6 +109,10 @@ func walk(nd:rt.TNode, offset:Dictionary):
 	var node = {}
 	node.name = nd.name
 	node.offset = offset[nd.name]
+	if  nd.get("fn"):
+		node.fn = nd.get("fn")
+		node.dp = nd.get("params")
+	
 	if  not nd.ticked:
 		node.status = "IDLE"
 	else:

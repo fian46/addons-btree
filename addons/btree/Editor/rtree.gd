@@ -1,6 +1,8 @@
 tool
 extends WindowDialog
 
+const rt = preload("res://addons/btree/Runtime/runtime.gd")
+
 func _on_rtree_about_to_show():
 	version = -1
 	var graph = $layout/split/debug_graph
@@ -117,6 +119,19 @@ func generate_tree(data:Dictionary):
 func walk(data, graph):
 	var node = create_node(data, data.child.size()) as GraphNode
 	node_map[node.name] = node.get_child(0)
+	if  data.has("fn"):
+		var label = Label.new()
+		label.text = str("Function Name : ", data.fn)
+		node.add_child(label)
+		var dp = data.dp
+		if  dp.size() > 0:
+			var pt = Label.new()
+			pt.text = "Parameters : "
+			node.add_child(pt)
+		for i in range(dp.size()):
+			var param = Label.new()
+			param.text = str(i, " : ", dp[i])
+			node.add_child(param)
 	node.offset = data.offset
 	graph.add_child(node)
 	for i in range(data.child.size()):
@@ -124,7 +139,7 @@ func walk(data, graph):
 		if  sel == null:
 			continue
 		var child = walk(sel, graph)
-		graph.call_deferred("connect_node", node.name, i, child.name, 0)
+		graph.connect_node( node.name, i, child.name, 0)
 	return node
 
 var node_scene = preload("res://addons/btree/Editor/root.tscn")
