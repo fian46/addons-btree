@@ -31,6 +31,12 @@ func client_data(id):
 				selected_instance.debug = null
 				selected_instance = null
 	elif msg.type == 1:
+		if  msg.instance_id == -1:
+			paused = false
+			step = false
+			if  selected_instance:
+				selected_instance.debug = null
+			return
 		var new_instance = instance_from_id(msg.instance_id)
 		if  selected_instance != new_instance:
 			paused = false
@@ -41,6 +47,8 @@ func client_data(id):
 			if  selected_instance:
 				selected_instance.debug = weakref(self)
 				flush(selected_instance)
+		else:
+			selected_instance.debug = weakref(self)
 	elif msg.type == 2:
 		paused = msg.paused
 	elif msg.type == 3:
