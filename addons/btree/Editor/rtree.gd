@@ -229,6 +229,7 @@ func stop_debug():
 	var msg = {}
 	msg.type = 1
 	msg.instance_id = -1
+	version = -1
 	write(msg)
 	return
 
