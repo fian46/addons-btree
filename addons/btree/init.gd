@@ -38,11 +38,15 @@ func make_visible(visible):
 	if  visible:
 		print("build")
 		selection_changed()
-		dock.get_node("editor/graph").reload()
+		var graph = dock.get_node("editor/graph")
+		graph.active = true
+		graph.reload()
 		dock.show()
 	else:
-		dock.get_node("editor/graph").clear_data()
-		dock.get_node("editor/graph").reload()
+		var graph = dock.get_node("editor/graph")
+		graph.active = false
+		graph.clear_data()
+		graph.reload()
 		dock.hide()
 	return
 
