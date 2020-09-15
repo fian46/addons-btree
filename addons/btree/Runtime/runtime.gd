@@ -130,8 +130,9 @@ class PSelector extends CompositeTNode:
 		return failed()
 
 class PCondition extends DecoratorTNode:
-	var target: FuncRef
+	var target:FuncRef
 	var params := []
+	var fn:String
 	
 	func _init():
 		status = Status.FAILED
@@ -145,6 +146,7 @@ class PCondition extends DecoratorTNode:
 	func setup(data: Dictionary, target):
 		.setup(data, target)
 		self.target = funcref(target, data.fn)
+		self.fn = data.fn
 		params = data.get('values', [])
 		return
 	
@@ -173,10 +175,12 @@ class Root extends DecoratorTNode:
 class Task extends TNode:
 	var target: FuncRef
 	var params := []
+	var fn:String
 	
 	func setup(data: Dictionary, target):
 		.setup(data, target)
 		self.target = funcref(target, data.fn)
+		self.fn = data.fn
 		params = data.get('values', [])
 		return
 	
@@ -317,10 +321,12 @@ class Repeat extends DecoratorTNode:
 class WhileNode extends DecoratorTNode:
 	var target: FuncRef
 	var params := []
+	var fn:String
 	
 	func setup(data: Dictionary, target):
 		.setup(data, target)
 		self.target = funcref(target, data.fn)
+		self.fn = data.fn
 		params = data.get('values', [])
 		return
 	
