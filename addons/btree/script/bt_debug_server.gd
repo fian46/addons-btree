@@ -12,11 +12,16 @@ var paused = false
 var step = false
 
 func _ready():
+	if  not OS.is_debug_build():
+		print("BT release build")
+		return
+	print("BT debug build")
 	server = WebSocketServer.new()
 	server.listen(7777)
 	server.connect("client_connected", self, "debug_attached")
 	server.connect("client_disconnected", self, "debug_detached")
 	server.connect("data_received", self, "client_data")
+	print("BT debug server init")
 	schedule_cleanup()
 	return
 
@@ -81,11 +86,10 @@ func flush(btree):
 func _process(delta):
 	if  server:
 		if  server.get_connection_status() != 0:
-			while queue.size() > 0:
+			while queue.size() > 0 and server.get_connection_status() == 2:
 				var front = queue.pop_front()
 				server.get_peer(connected_id).put_var(front, true)
-			for i in range(120):
-				server.poll()
+			server.poll()
 	return
 
 func extract_data(btree):

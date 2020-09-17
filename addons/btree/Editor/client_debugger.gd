@@ -51,10 +51,8 @@ func disconected(was_it_clean):
 func _process(delta):
 	if  client:
 		if  client.get_connection_status() != 0:
-			if  client.get_connection_status() == 2:
-				while queue.size() > 0:
-					var front = queue.pop_front()
-					client.get_peer(1).put_var(front, true)
-			for i in range(120):
-				client.poll()
+			while queue.size() > 0 and client.get_connection_status() == 2:
+				var front = queue.pop_front()
+				client.get_peer(1).put_var(front, true)
+			client.poll()
 	return
