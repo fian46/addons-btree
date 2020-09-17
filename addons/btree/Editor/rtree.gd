@@ -100,7 +100,7 @@ func update_label(node, status):
 	if  status == "IDLE":
 		node.self_modulate = Color.white
 	elif  status == "RUNNING":
-		node.self_modulate = Color.blue
+		node.self_modulate = Color.yellow
 	elif  status == "SUCCEED":
 		node.self_modulate = Color.green
 	else:

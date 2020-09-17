@@ -22,16 +22,20 @@ func reload():
 		return
 	if  not control:
 		return
+	if  not valid_script():
+		get_parent().get_parent().halt(true)
+	build_tree_from_data()
+	return
+
+func valid_script():
 	var pscript:GDScript = data.get_parent().get_script()
 	var cscript:GDScript = GDScript.new()
 	cscript.set_source_code(pscript.get_source_code())
 	if  cscript.reload(false) != OK:
 #		hacky trick to compile gdscript implementation
 #		different language need different implementation
-		get_parent().halt(true)
-		return
-	build_tree_from_data()
-	return
+		return false
+	return true
 
 func clear_data():
 	data = null
@@ -201,6 +205,9 @@ func _on_save_pressed():
 		return
 	if  not data:
 		hint("No BTREE selected !")
+		return
+	if  not valid_script():
+		print("BT Editor Skip Saving, Script Error")
 		return
 	hint("Saving Data")
 	data.tree = {}
