@@ -43,6 +43,7 @@ func make_visible(visible):
 		dock.show()
 	else:
 		var graph = dock.get_node("editor/graph")
+		graph._on_save_pressed()
 		graph.active = false
 		graph.clear_data()
 		graph.reload()
@@ -50,6 +51,7 @@ func make_visible(visible):
 	return
 
 func apply_changes():
+#	why you behave not consistent ? please fix this
 	var graph = dock.get_node("editor/graph")
 	graph._on_save_pressed()
 	return
