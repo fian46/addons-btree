@@ -36,7 +36,6 @@ func make_visible(visible):
 	if  not dock:
 		return
 	if  visible:
-		print("build")
 		selection_changed()
 		var graph = dock.get_node("editor/graph")
 		graph.active = true
@@ -44,11 +43,15 @@ func make_visible(visible):
 		dock.show()
 	else:
 		var graph = dock.get_node("editor/graph")
-		graph._on_save_pressed()
 		graph.active = false
 		graph.clear_data()
 		graph.reload()
 		dock.hide()
+	return
+
+func apply_changes():
+	var graph = dock.get_node("editor/graph")
+	graph._on_save_pressed()
 	return
 
 func get_plugin_icon():
