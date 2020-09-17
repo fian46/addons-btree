@@ -225,8 +225,8 @@ func _on_save_pressed():
 	build_tree(root, get_connection_list(), info.nodes)
 	info.root = root
 	info.connection = get_connection_list()
-	if  control:
-		control.get_editor_interface().save_scene()
+#	if  control:
+#		control.get_editor_interface().save_scene()
 	return
 
 func build_tree(root, conn:Array, nodes):
