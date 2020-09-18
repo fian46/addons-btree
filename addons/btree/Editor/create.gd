@@ -4,7 +4,7 @@ extends MenuButton
 var pop = null
 
 const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
-const error_no_task = "No function start with \"task_*(task)\" action ignored"
+const error_no_task = "No function start with \"task_*(task)\" please create one !"
 
 var pselector_scene = preload("res://addons/btree/Editor/pselector/pselector.tscn")
 var mute_scene = preload("res://addons/btree/Editor/mute/mute.tscn")
@@ -26,7 +26,6 @@ func id_pressed(id):
 			if  not graph.node_has_task():
 				var hint = get_node(hint_path)
 				hint.text = error_no_task
-				return 
 			inst = general_fcall_scene.instance()
 			inst.as_task()
 		Runtime.TNodeTypes.SELECTOR:  
@@ -41,7 +40,6 @@ func id_pressed(id):
 			if  not graph.node_has_task():
 				var hint = get_node(hint_path)
 				hint.text = error_no_task
-				return 
 			inst = general_fcall_scene.instance()
 			inst.as_priority_condition()
 		Runtime.TNodeTypes.PARALEL:
@@ -55,7 +53,6 @@ func id_pressed(id):
 			if  not graph.node_has_task():
 				var hint = get_node(hint_path)
 				hint.text = error_no_task
-				return 
 			inst = general_fcall_scene.instance()
 			inst.as_while()
 		Runtime.TNodeTypes.WAIT:
