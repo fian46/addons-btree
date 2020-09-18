@@ -108,7 +108,9 @@ func set_data(data):
 func get_data():
 	var opt = $Main/Required/opt_function
 	var sel = $Main/Required/opt_function.selected
-	var fname = opt.get_item_text(sel)
+	var fname = null
+	if  sel != -1:
+		fname = opt.get_item_text(sel)
 	var pr = $Params
 	
 	var ret_param = []

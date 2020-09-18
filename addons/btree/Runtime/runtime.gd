@@ -145,14 +145,17 @@ class PCondition extends DecoratorTNode:
 	
 	func setup(data: Dictionary, target):
 		.setup(data, target)
-		self.target = funcref(target, data.fn)
-		self.fn = data.fn
+		if  data.fn:
+			self.target = funcref(target, data.fn)
+		self.fn = str(data.fn)
 		params = data.get('values', [])
 		return
 	
 	func tick() -> int:
 		ticked = true
 		if  not child:
+			return failed()
+		if  not target:
 			return failed()
 		target.call_func(self)
 		return status
@@ -179,8 +182,9 @@ class Task extends TNode:
 	
 	func setup(data: Dictionary, target):
 		.setup(data, target)
-		self.target = funcref(target, data.fn)
-		self.fn = data.fn
+		if  data.fn:
+			self.target = funcref(target, data.fn)
+		self.fn = str(data.fn)
 		params = data.get('values', [])
 		return
 	
@@ -188,6 +192,8 @@ class Task extends TNode:
 		ticked = true
 		if  status != Status.RUNNING:
 			return status
+		if  not target:
+			return failed()
 		target.call_func(self)
 		return status
 	
@@ -325,8 +331,9 @@ class WhileNode extends DecoratorTNode:
 	
 	func setup(data: Dictionary, target):
 		.setup(data, target)
-		self.target = funcref(target, data.fn)
-		self.fn = data.fn
+		if  data.fn:
+			self.target = funcref(target, data.fn)
+		self.fn = str(data.fn)
 		params = data.get('values', [])
 		return
 	
@@ -337,6 +344,8 @@ class WhileNode extends DecoratorTNode:
 		if  not child:
 			return failed()
 		failed()
+		if  not target:
+			return failed()
 		target.call_func(self)
 		if  status == Status.SUCCEED:
 			status = child.tick()

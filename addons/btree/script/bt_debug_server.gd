@@ -12,6 +12,7 @@ var paused = false
 var step = false
 
 func _ready():
+	get_tree().set_meta("BT_SERVER", self)
 	if  not OS.is_debug_build():
 		print("BT release build")
 		return
@@ -141,6 +142,7 @@ func write(msg):
 	return
 
 func register_instance(root):
+	print("register : ", root)
 	objects.append(weakref(root))
 	return
 
