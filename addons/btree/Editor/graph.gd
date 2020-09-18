@@ -6,7 +6,6 @@ var root_object = null
 var control = null
 var active = false
 export(NodePath) var hint_path:NodePath
-export(NodePath) var debugger_path:NodePath
 
 func _ready():
 	set_process_input(true)
@@ -22,18 +21,35 @@ func reload():
 		return
 	if  not control:
 		return
+	if  not node_has_script():
+		get_parent().get_parent().halt("you need to attach script in parent node of BTREE")
+		return
 	if  not valid_script():
-		get_parent().get_parent().halt(true)
+		get_parent().get_parent().halt("node script is error please fix it first before edit")
+		return
 	build_tree_from_data()
 	return
 
+func node_has_task():
+	var ml = data.get_parent().get_method_list()
+	for m in ml:
+		if  m.name.begins_with("task_") and m.args.size() == 1:
+			return true
+	return false
+
+func node_has_script():
+	var pscript:GDScript = data.get_parent().get_script()
+	if  not pscript:
+		return false
+	return true
+
 func valid_script():
 	var pscript:GDScript = data.get_parent().get_script()
+	if  not pscript:
+		return false
 	var cscript:GDScript = GDScript.new()
 	cscript.set_source_code(pscript.get_source_code())
 	if  cscript.reload(false) != OK:
-#		hacky trick to compile gdscript implementation
-#		different language need different implementation
 		return false
 	return true
 
@@ -618,7 +634,7 @@ func popup_request(position):
 	return
 
 func _on_debug_pressed():
-	get_node(debugger_path).popup_centered()
+	get_parent().get_parent().debug()
 	return
 
 func _on_help_pressed():

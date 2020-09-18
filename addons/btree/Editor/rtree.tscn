@@ -1,0 +1,88 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://addons/btree/Editor/rtree.gd" type="Script" id=1]
+[ext_resource path="res://addons/btree/Editor/client_debugger.gd" type="Script" id=2]
+[ext_resource path="res://addons/btree/Editor/debug_graph.gd" type="Script" id=3]
+
+[node name="rtree" type="WindowDialog"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+popup_exclusive = true
+window_title = "Remote Debugger"
+resizable = true
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="client_debugger" type="Control" parent="."]
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="layout" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="hbox2" type="HBoxContainer" parent="layout"]
+margin_right = 1024.0
+margin_bottom = 14.0
+
+[node name="Label" type="Label" parent="layout/hbox2"]
+margin_right = 104.0
+margin_bottom = 14.0
+text = "Select a BTREE : "
+
+[node name="split" type="HSplitContainer" parent="layout"]
+margin_top = 18.0
+margin_right = 1024.0
+margin_bottom = 576.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+split_offset = 200
+
+[node name="rtree" type="Tree" parent="layout/split"]
+margin_right = 201.0
+margin_bottom = 558.0
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="debug_graph" type="GraphEdit" parent="layout/split"]
+margin_left = 213.0
+margin_right = 1024.0
+margin_bottom = 558.0
+scroll_offset = Vector2( -80, -138 )
+script = ExtResource( 3 )
+
+[node name="hbox3" type="HBoxContainer" parent="layout"]
+margin_top = 580.0
+margin_right = 1024.0
+margin_bottom = 600.0
+alignment = 2
+
+[node name="pause" type="Button" parent="layout/hbox3"]
+margin_left = 916.0
+margin_right = 979.0
+margin_bottom = 20.0
+text = "PAUSED"
+
+[node name="step" type="Button" parent="layout/hbox3"]
+margin_left = 983.0
+margin_right = 1024.0
+margin_bottom = 20.0
+text = "STEP"
+[connection signal="about_to_show" from="." to="." method="_on_rtree_about_to_show"]
+[connection signal="popup_hide" from="." to="." method="_on_rtree_popup_hide"]
+[connection signal="item_selected" from="layout/split/rtree" to="." method="_on_rtree_item_selected"]
+[connection signal="gui_input" from="layout/split/debug_graph" to="layout/split/debug_graph" method="gui_input"]
+[connection signal="pressed" from="layout/hbox3/pause" to="." method="_on_pause_pressed"]
+[connection signal="button_down" from="layout/hbox3/step" to="." method="_on_step_button_down"]
+[connection signal="button_up" from="layout/hbox3/step" to="." method="_on_step_button_up"]

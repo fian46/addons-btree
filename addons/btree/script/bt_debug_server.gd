@@ -1,10 +1,10 @@
 extends Node
 
 const rt = preload("res://addons/btree/Runtime/runtime.gd")
+var bt_script = load("res://addons/btree/script/btree.gd")
 var server = WebSocketServer.new()
 var objects = []
 var connected_id = -1
-var btree_script:GDScript = preload("res://addons/btree/script/btree.gd")
 var queue = []
 var send_tree = false
 var selected_instance
@@ -165,7 +165,7 @@ func cleanup():
 		parent.name = str("[", ref.name, "@" , ref.get_instance_id(), "]")
 		var tree = {}
 		for child in ref.get_children():
-			if  child is btree_script:
+			if  child is bt_script:
 				var btree = {}
 				btree.id = child.get_instance_id()
 				btree.name = str("[ ", child.name, "@", child.get_instance_id(), "]")
