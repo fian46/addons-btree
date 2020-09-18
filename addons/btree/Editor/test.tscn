@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://addons/btree/Editor/test.gd" type="Script" id=1]
 [ext_resource path="res://addons/btree/Editor/editor.tscn" type="PackedScene" id=2]
 [ext_resource path="res://addons/btree/Editor/help.tscn" type="PackedScene" id=3]
+[ext_resource path="res://addons/btree/Editor/rtree.tscn" type="PackedScene" id=4]
 
 [node name="test" type="Panel"]
 anchor_right = 1.0
@@ -23,11 +24,15 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 0
 custom_colors/font_color = Color( 1, 0, 0, 1 )
-text = "No BTREE node is selected OR the parent script is ERROR !"
+text = "No BTREE node is selected OR the parent node not have any script OR parent node script is error"
 align = 1
 valign = 1
+autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="help" parent="." instance=ExtResource( 3 )]
+visible = false
+
+[node name="rtree" parent="." instance=ExtResource( 4 )]

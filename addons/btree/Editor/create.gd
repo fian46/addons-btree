@@ -4,6 +4,7 @@ extends MenuButton
 var pop = null
 
 const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
+const error_no_task = "No function start with \"task_*(task)\" action ignored"
 
 var pselector_scene = preload("res://addons/btree/Editor/pselector/pselector.tscn")
 var mute_scene = preload("res://addons/btree/Editor/mute/mute.tscn")
@@ -14,13 +15,18 @@ var general_decorator_scene = preload("res://addons/btree/Editor/general_decorat
 var inverter = preload("res://addons/btree/Editor/inverter/inverter.tscn")
 var pop_pos = Vector2.ZERO
 export(NodePath) var graph_path:NodePath
+export(NodePath) var hint_path:NodePath
 
 func id_pressed(id):
 	var graph = get_node(graph_path)
 	var zoom =  graph.zoom
 	var inst = null
 	match id:
-		Runtime.TNodeTypes.TASK: 
+		Runtime.TNodeTypes.TASK:
+			if  not graph.node_has_task():
+				var hint = get_node(hint_path)
+				hint.text = error_no_task
+				return 
 			inst = general_fcall_scene.instance()
 			inst.as_task()
 		Runtime.TNodeTypes.SELECTOR:  
@@ -32,6 +38,10 @@ func id_pressed(id):
 		Runtime.TNodeTypes.PRIORITY_SELECTOR:
 			inst = pselector_scene.instance()
 		Runtime.TNodeTypes.PRIORITY_CONDITION:
+			if  not graph.node_has_task():
+				var hint = get_node(hint_path)
+				hint.text = error_no_task
+				return 
 			inst = general_fcall_scene.instance()
 			inst.as_priority_condition()
 		Runtime.TNodeTypes.PARALEL:
@@ -42,6 +52,10 @@ func id_pressed(id):
 		Runtime.TNodeTypes.REPEAT:
 			inst = repeat_scene.instance()
 		Runtime.TNodeTypes.WHILE:
+			if  not graph.node_has_task():
+				var hint = get_node(hint_path)
+				hint.text = error_no_task
+				return 
 			inst = general_fcall_scene.instance()
 			inst.as_while()
 		Runtime.TNodeTypes.WAIT:

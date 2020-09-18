@@ -16,20 +16,20 @@ func selection_changed():
 	var selection = get_editor_interface().get_selection().get_selected_nodes()
 	if  not selection:
 		tree_editor.clear_data()
-		dock.halt(true)
+		dock.halt("Please select a BTREE node")
 		return
 	if  selection.size() == 1:
 		if  selection[0] is btree:
 			tree_editor.load_data(selection[0], self)
-			dock.halt(false)
+			dock.halt(null)
 			if  dock.visible:
 				tree_editor.reload()
 		else:
 			tree_editor.clear_data()
-			dock.halt(true)
+			dock.halt("Please select a BTREE node")
 	else:
 		tree_editor.clear_data()
-		dock.halt(true)
+		dock.halt("Please select a BTREE node")
 	return
 
 func make_visible(visible):
@@ -75,7 +75,7 @@ func disable_plugin():
 
 func _enter_tree():
 	dock = dock_scene.instance()
-	dock.halt(true)
+	dock.halt("Please select a BTREE node")
 	add_custom_type("BTREE", "Node", btree, ibtree)
 	get_editor_interface().get_editor_viewport().add_child(dock)
 	get_editor_interface().get_selection().connect("selection_changed",self,"selection_changed");
