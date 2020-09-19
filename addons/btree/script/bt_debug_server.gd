@@ -23,7 +23,6 @@ func _ready():
 	server.connect("client_disconnected", self, "debug_detached")
 	server.connect("data_received", self, "client_data")
 	print("BT debug server init")
-	schedule_cleanup()
 	return
 
 func client_data(id):
@@ -85,6 +84,7 @@ func flush(btree):
 	return
 
 func _process(delta):
+	schedule_cleanup()
 	if  server:
 		if  server.get_connection_status() != 0:
 			while queue.size() > 0 and server.get_connection_status() == 2:
@@ -142,13 +142,15 @@ func write(msg):
 	return
 
 func register_instance(root):
-	print("register : ", root)
 	objects.append(weakref(root))
 	return
 
+var tick = 0
 func schedule_cleanup():
-	yield(get_tree().create_timer(1), "timeout")
-	cleanup()
+	tick += 1
+	if  tick > 60:
+		tick = 0
+		cleanup()
 	return
 
 var net_data = {}

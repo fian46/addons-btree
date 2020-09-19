@@ -11,7 +11,6 @@ func selection_changed():
 	if  not dock:
 		return
 	var tree_editor = dock.get_node("editor/graph")
-	print(tree_editor)
 	tree_editor.clear_editor()
 	var selection = get_editor_interface().get_selection().get_selected_nodes()
 	if  not selection:
