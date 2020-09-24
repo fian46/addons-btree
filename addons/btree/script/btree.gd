@@ -6,6 +6,7 @@ export(Dictionary) var tree = {}
 export(bool) var enable = true
 export(int, '_process', '_physics_process') var run_on = 0
 var rtree: Runtime.TNode = null
+var swap_tree
 
 func _ready():
 	if  get_tree().has_meta("BT_SERVER"):
@@ -14,16 +15,24 @@ func _ready():
 	return
 
 func _enter_tree():
+	create_runtime()
+	return
+
+func create_runtime():
 	rtree = Runtime.create_runtime(tree.get('root', {}), get_parent())
 	return
 
+func swap_runtime(new_tree):
+	swap_tree = new_tree
+	return
+
 func _process(delta):
-	if run_on == 0:
+	if  run_on == 0:
 		btree_process(delta)
 	return
 
 func _physics_process(delta):
-	if run_on == 1:
+	if  run_on == 1:
 		btree_process(delta)
 	return
 
@@ -49,6 +58,12 @@ func tick():
 	return
 
 func _tick():
+	if  swap_tree:
+		tree = swap_tree
+		swap_tree = null
+		create_runtime()
+		rtree.reset()
+	
 	var status = rtree.tick()
 	flush()
 	if  status != Runtime.Status.RUNNING:
