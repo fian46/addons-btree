@@ -30,7 +30,8 @@ func reload():
 		return
 	if  not data.tree.has("tree_id"):
 		tree_id = OS.get_unique_id() + "-" + str(hash(str(OS.get_time(true))))
-		get_parent().get_parent().upgrade()
+		if  not data.tree.empty():
+			get_parent().get_parent().upgrade()
 	else:
 		tree_id = data.tree.tree_id
 	build_tree_from_data()
