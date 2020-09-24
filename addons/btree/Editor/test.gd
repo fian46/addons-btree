@@ -16,3 +16,7 @@ func help():
 func debug():
 	$rtree.popup_centered()
 	return
+
+func upgrade():
+	$upgrade.popup_centered()
+	return

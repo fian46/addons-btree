@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://addons/btree/Editor/test.gd" type="Script" id=1]
 [ext_resource path="res://addons/btree/Editor/editor.tscn" type="PackedScene" id=2]
 [ext_resource path="res://addons/btree/Editor/help.tscn" type="PackedScene" id=3]
 [ext_resource path="res://addons/btree/Editor/rtree.tscn" type="PackedScene" id=4]
+[ext_resource path="res://addons/btree/Editor/upgrade_to_realtime.tscn" type="PackedScene" id=5]
 
 [node name="test" type="Panel"]
 anchor_right = 1.0
@@ -33,6 +34,7 @@ __meta__ = {
 }
 
 [node name="help" parent="." instance=ExtResource( 3 )]
-visible = false
 
 [node name="rtree" parent="." instance=ExtResource( 4 )]
+
+[node name="upgrade" parent="." instance=ExtResource( 5 )]

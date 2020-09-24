@@ -58,6 +58,18 @@ func client_data(id):
 		paused = msg.paused
 	elif msg.type == 3:
 		step = msg.step
+	elif msg.type == 4:
+		hot_reload(msg.data)
+	return
+
+func hot_reload(data):
+	for wr in objects:
+		var ref = wr.get_ref()
+		if  ref:
+			for child in ref.get_children():
+				if  child is bt_script:
+					if  child.tree.tree_id == data.tree_id:
+						child.swap_runtime(data)
 	return
 
 func debug_detached(id, was_clean):

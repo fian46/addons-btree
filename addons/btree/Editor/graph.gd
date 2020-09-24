@@ -5,6 +5,7 @@ var data = null
 var root_object = null
 var control = null
 var active = false
+var tree_id = null
 export(NodePath) var hint_path:NodePath
 
 func _ready():
@@ -27,6 +28,11 @@ func reload():
 	if  not valid_script():
 		get_parent().get_parent().halt("node script is error please fix it first before edit")
 		return
+	if  not data.tree.has("tree_id"):
+		tree_id = OS.get_unique_id() + "-" + str(hash(str(OS.get_time(true))))
+		get_parent().get_parent().upgrade()
+	else:
+		tree_id = data.tree.tree_id
 	build_tree_from_data()
 	return
 
@@ -227,6 +233,7 @@ func _on_save_pressed():
 		return
 	hint("Saving Data")
 	data.tree = {}
+	data.tree.tree_id = tree_id
 	var info = data.tree
 	info.nodes = []
 	for i in get_children():
@@ -241,8 +248,15 @@ func _on_save_pressed():
 	build_tree(root, get_connection_list(), info.nodes)
 	info.root = root
 	info.connection = get_connection_list()
-#	if  control:
-#		control.get_editor_interface().save_scene()
+	var client = get_parent().get_parent().get_node("rtree/client_debugger")
+	var ws:WebSocketClient = client.client as WebSocketClient
+	if  ws.get_connection_status() == 2:
+		hint("BT hot reload")
+		print("BT hot reload")
+		var msg = {}
+		msg.type = 4
+		msg.data = data.tree
+		client.write(msg)
 	return
 
 func build_tree(root, conn:Array, nodes):
