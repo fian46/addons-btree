@@ -5,13 +5,24 @@ const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
 export(Dictionary) var tree = {}
 export(bool) var enable = true
 export(int, '_process', '_physics_process') var run_on = 0
+export(String) var _tree_id = ""
 var rtree: Runtime.TNode = null
 var swap_tree
 
 func _ready():
+	generate_id()
 	if  get_tree().has_meta("BT_SERVER"):
 		var debug = get_tree().get_meta("BT_SERVER")
 		debug.register_instance(get_parent())
+	return
+
+func generate_id():
+	var cn:Node = self
+	while cn != null && (cn.filename == "" || cn.filename == null):
+		cn = cn.get_parent()
+	if  cn:
+		var path = cn.get_path_to(self)
+		_tree_id = str(hash(cn.filename)) + str(hash(str(path)))
 	return
 
 func _enter_tree():
@@ -19,6 +30,7 @@ func _enter_tree():
 	return
 
 func create_runtime():
+	print("BT runtime created")
 	rtree = Runtime.create_runtime(tree.get('root', {}), get_parent())
 	return
 

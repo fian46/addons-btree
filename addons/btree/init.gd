@@ -50,7 +50,6 @@ func make_visible(visible):
 	return
 
 func apply_changes():
-#	why you behave not consistent ? please fix this
 	var graph = dock.get_node("editor/graph")
 	graph._on_save_pressed()
 	return
@@ -78,11 +77,37 @@ func _enter_tree():
 	add_custom_type("BTREE", "Node", btree, ibtree)
 	get_editor_interface().get_editor_viewport().add_child(dock)
 	get_editor_interface().get_selection().connect("selection_changed",self,"selection_changed");
+	var ps = ProjectSettings
+	var mbo = "network/limits/websocket_server/max_out_buffer_kb"
+	var mbi = "network/limits/websocket_server/max_in_buffer_kb"
+	ps.set_setting(mbo, 4096)
+	ps.set_setting(mbi, 4096)
+	ps.save()
 	make_visible(false)
 	add_autoload_singleton("BTDebugServer", "res://addons/btree/script/bt_debug_server.gd")
+	get_tree().connect("node_added", self, "nodes")
+	get_tree().connect("node_renamed", self, "nodes")
+	return
+
+func nodes(node):
+	if  node is btree:
+		var cn:Node = node
+		while cn != null && (cn.filename == "" || cn.filename == null):
+			cn = cn.get_parent()
+		if  cn:
+			var path = cn.get_path_to(node)
+			node._tree_id = str(hash(cn.filename)) + str(hash(str(path)))
 	return
 
 func _exit_tree():
+	var ps = ProjectSettings
+	var mbo = "network/limits/websocket_server/max_out_buffer_kb"
+	var mbi = "network/limits/websocket_server/max_in_buffer_kb"
+	ps.set_setting(mbo, ps.property_get_revert(mbo))
+	ps.set_setting(mbi, ps.property_get_revert(mbi))
+	ps.save()
+	get_tree().disconnect("node_added",self, "nodes")
+	get_tree().disconnect("node_renamed", self, "nodes")
 	remove_custom_type("BTREE")
 	remove_autoload_singleton("BTDebugServer")
 	if  not dock:
