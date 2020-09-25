@@ -59,16 +59,16 @@ func client_data(id):
 	elif msg.type == 3:
 		step = msg.step
 	elif msg.type == 4:
-		hot_reload(msg.data)
+		hot_reload(msg.id, msg.data)
 	return
 
-func hot_reload(data):
+func hot_reload(id, data):
 	for wr in objects:
 		var ref = wr.get_ref()
 		if  ref:
 			for child in ref.get_children():
 				if  child is bt_script:
-					if  child.tree.tree_id == data.tree_id:
+					if  child._tree_id == id:
 						child.swap_runtime(data)
 	return
 

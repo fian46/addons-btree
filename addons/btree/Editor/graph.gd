@@ -5,7 +5,6 @@ var data = null
 var root_object = null
 var control = null
 var active = false
-var tree_id = null
 export(NodePath) var hint_path:NodePath
 
 func _ready():
@@ -28,12 +27,6 @@ func reload():
 	if  not valid_script():
 		get_parent().get_parent().halt("node script is error please fix it first before edit")
 		return
-	if  not data.tree.has("tree_id"):
-		tree_id = OS.get_unique_id() + "-" + str(hash(str(OS.get_time(true))))
-		if  not data.tree.empty():
-			get_parent().get_parent().upgrade()
-	else:
-		tree_id = data.tree.tree_id
 	build_tree_from_data()
 	return
 
@@ -224,17 +217,24 @@ func child_delete(node):
 
 func _on_save_pressed():
 	if  not active:
-		print("BT Editor Skip Saving Data")
+		print("BT Editor Skip Saving Data !")
 		return
 	if  not data:
 		hint("No BTREE selected !")
 		return
 	if  not valid_script():
-		print("BT Editor Skip Saving, Script Error")
+		print("BT Editor Skip Saving, Script Error !")
 		return
 	hint("Saving Data")
+	print("BT Save")
 	data.tree = {}
-	data.tree.tree_id = tree_id
+	var cn:Node = data
+	while cn != null && (cn.filename == "" || cn.filename == null):
+		cn = cn.get_parent()
+	if  cn:
+		var path = cn.get_path_to(data)
+		data._tree_id = str(hash(cn.filename)) + str(hash(str(path)))
+	
 	var info = data.tree
 	info.nodes = []
 	for i in get_children():
@@ -253,9 +253,9 @@ func _on_save_pressed():
 	var ws:WebSocketClient = client.client as WebSocketClient
 	if  ws.get_connection_status() == 2:
 		hint("BT hot reload")
-		print("BT hot reload")
 		var msg = {}
 		msg.type = 4
+		msg.id = data._tree_id
 		msg.data = data.tree
 		client.write(msg)
 	return
@@ -339,12 +339,6 @@ func gui_input(event):
 			accept_event()
 			hint("Zoom Out")
 			return
-	return
-
-func _input(event):
-	if  event is InputEventKey and event.scancode == KEY_S and not event.pressed and event.control:
-		_on_save_pressed()
-		accept_event()
 	return
 
 var selected:Node
