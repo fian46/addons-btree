@@ -217,16 +217,24 @@ func child_delete(node):
 
 func _on_save_pressed():
 	if  not active:
-		print("BT Editor Skip Saving Data")
+		print("BT Editor Skip Saving Data !")
 		return
 	if  not data:
 		hint("No BTREE selected !")
 		return
 	if  not valid_script():
-		print("BT Editor Skip Saving, Script Error")
+		print("BT Editor Skip Saving, Script Error !")
 		return
 	hint("Saving Data")
+	print("BT Save")
 	data.tree = {}
+	var cn:Node = data
+	while cn != null && (cn.filename == "" || cn.filename == null):
+		cn = cn.get_parent()
+	if  cn:
+		var path = cn.get_path_to(data)
+		data._tree_id = str(hash(cn.filename)) + str(hash(str(path)))
+	
 	var info = data.tree
 	info.nodes = []
 	for i in get_children():
@@ -241,8 +249,15 @@ func _on_save_pressed():
 	build_tree(root, get_connection_list(), info.nodes)
 	info.root = root
 	info.connection = get_connection_list()
-#	if  control:
-#		control.get_editor_interface().save_scene()
+	var client = get_parent().get_parent().get_node("rtree/client_debugger")
+	var ws:WebSocketClient = client.client as WebSocketClient
+	if  ws.get_connection_status() == 2:
+		hint("BT hot reload")
+		var msg = {}
+		msg.type = 4
+		msg.id = data._tree_id
+		msg.data = data.tree
+		client.write(msg)
 	return
 
 func build_tree(root, conn:Array, nodes):
@@ -324,12 +339,6 @@ func gui_input(event):
 			accept_event()
 			hint("Zoom Out")
 			return
-	return
-
-func _input(event):
-	if  event is InputEventKey and event.scancode == KEY_S and not event.pressed and event.control:
-		_on_save_pressed()
-		accept_event()
 	return
 
 var selected:Node

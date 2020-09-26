@@ -6,6 +6,8 @@
 margin_right = 127.0
 margin_bottom = 85.0
 mouse_filter = 1
+size_flags_horizontal = 7
+size_flags_vertical = 7
 title = "general_fcall"
 show_close = true
 resizable = true
@@ -28,15 +30,18 @@ slot/2/right_enabled = false
 slot/2/right_type = 0
 slot/2/right_color = Color( 1, 1, 1, 1 )
 script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="Main" type="VBoxContainer" parent="."]
 margin_left = 16.0
 margin_top = 24.0
-margin_right = 170.0
+margin_right = 158.0
 margin_bottom = 44.0
 
 [node name="Required" type="HBoxContainer" parent="Main"]
-margin_right = 154.0
+margin_right = 142.0
 margin_bottom = 20.0
 rect_min_size = Vector2( 0, 20 )
 
@@ -48,14 +53,14 @@ text = "Function Name : "
 
 [node name="opt_function" type="OptionButton" parent="Main/Required"]
 margin_left = 113.0
-margin_right = 154.0
+margin_right = 142.0
 margin_bottom = 20.0
 
 [node name="Input" type="HBoxContainer" parent="."]
 margin_left = 16.0
-margin_top = 44.0
-margin_right = 170.0
-margin_bottom = 64.0
+margin_top = 45.0
+margin_right = 158.0
+margin_bottom = 65.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -75,6 +80,8 @@ text = "+"
 
 [node name="Params" type="VBoxContainer" parent="."]
 margin_left = 16.0
-margin_top = 65.0
-margin_right = 170.0
-margin_bottom = 65.0
+margin_top = 66.0
+margin_right = 158.0
+margin_bottom = 66.0
+size_flags_horizontal = 3
+size_flags_vertical = 15
