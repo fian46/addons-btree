@@ -10,6 +10,7 @@ var send_tree = false
 var selected_instance
 var paused = false
 var step = false
+var hot_reload_cache = {}
 
 func _ready():
 	get_tree().set_meta("BT_SERVER", self)
@@ -63,6 +64,7 @@ func client_data(id):
 	return
 
 func hot_reload(id, data):
+	hot_reload_cache[id] = data
 	for wr in objects:
 		var ref = wr.get_ref()
 		if  ref:
@@ -155,6 +157,11 @@ func write(msg):
 
 func register_instance(root):
 	objects.append(weakref(root))
+	for ch in root.get_children():
+		if  ch is bt_script:
+			if  hot_reload_cache.has(ch._tree_id):
+				var tree = hot_reload_cache[ch._tree_id]
+				ch.swap_runtime(tree)
 	return
 
 var tick = 0
