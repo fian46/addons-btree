@@ -161,6 +161,12 @@ class PCondition extends DecoratorTNode:
 		return status
 	
 	func get_param(idx):
+		if  params.empty():
+			print("BT error param index : {", idx, "} for node ", name)
+			return null
+		if  idx < 0 and idx <= params.size():
+			print("BT error param index : {", idx, "} for node ", name)
+			return null
 		return params[idx]
 		
 	func get_param_count():
@@ -198,6 +204,12 @@ class Task extends TNode:
 		return status
 	
 	func get_param(idx):
+		if  params.empty():
+			print("BT error param index : {", idx, "} for node ", name)
+			return null
+		if  idx < 0 and idx <= params.size():
+			print("BT error param index : {", idx, "} for node ", name)
+			return null
 		return params[idx]
 		
 	func get_param_count():
@@ -352,6 +364,12 @@ class WhileNode extends DecoratorTNode:
 		return status
 	
 	func get_param(idx):
+		if  params.empty():
+			print("BT error param index : {", idx, "} for node ", name)
+			return null
+		if  idx < 0 and idx <= params.size():
+			print("BT error param index : {", idx, "} for node ", name)
+			return null
 		return params[idx]
 		
 	func get_param_count():

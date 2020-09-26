@@ -33,6 +33,5 @@ __meta__ = {
 }
 
 [node name="help" parent="." instance=ExtResource( 3 )]
-visible = false
 
 [node name="rtree" parent="." instance=ExtResource( 4 )]
