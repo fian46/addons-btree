@@ -38,6 +38,8 @@ func make_visible(visible):
 		selection_changed()
 		var graph = dock.get_node("editor/graph")
 		graph.active = true
+		graph.editor_interface = get_editor_interface()
+		graph.undo_redo = get_undo_redo()
 		graph.reload()
 		dock.show()
 	else:
@@ -87,6 +89,7 @@ func _enter_tree():
 	add_autoload_singleton("BTDebugServer", "res://addons/btree/script/bt_debug_server.gd")
 	get_tree().connect("node_added", self, "nodes")
 	get_tree().connect("node_renamed", self, "nodes")
+	get_undo_redo().clear_history()
 	return
 
 func nodes(node):
@@ -114,4 +117,10 @@ func _exit_tree():
 		return
 	dock.queue_free()
 	dock = null
+	get_undo_redo().clear_history()
 	return
+
+func handles(object):
+	if  object is btree:
+		return true
+	return false
