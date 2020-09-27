@@ -5,6 +5,8 @@ var data = null
 var root_object = null
 var control = null
 var active = false
+var undo_redo:UndoRedo
+var editor_interface:EditorInterface
 export(NodePath) var hint_path:NodePath
 
 func _ready():
@@ -94,18 +96,7 @@ func build_tree_from_data():
 		return
 	if  not data.tree.has("nodes"):
 		return
-	var nodes = data.tree.nodes
-	var root = data.tree.root
-	var conn = data.tree.connection
-	for n in nodes:
-		if  n.type == Runtime.TNodeTypes.ROOT:
-			var node = get_node("root")
-			node.set_data(n.data)
-		else:
-			var node = create_node(n)
-			add_child(node)
-	for c in data.tree.connection:
-		connect_node(c.from, c.from_port, c.to, c.to_port)
+	load_from(data.tree)
 	return
 
 func create_node(n):
@@ -227,7 +218,8 @@ func _on_save_pressed():
 		return
 	hint("Saving Data")
 	print("BT Save")
-	data.tree = {}
+	data.tree = create_snapshot()
+	
 	var cn:Node = data
 	while cn != null && (cn.filename == "" || cn.filename == null):
 		cn = cn.get_parent()
@@ -235,20 +227,6 @@ func _on_save_pressed():
 		var path = cn.get_path_to(data)
 		data._tree_id = str(hash(cn.filename)) + str(hash(str(path)))
 	
-	var info = data.tree
-	info.nodes = []
-	for i in get_children():
-		if  i is GraphNode:
-			var node = Dictionary()
-			node["name"] = i.name
-			node["type"] = i.type
-			node["data"] = i.get_data()
-			info.nodes.append(node)
-	
-	var root = find("root", info.nodes)
-	build_tree(root, get_connection_list(), info.nodes)
-	info.root = root
-	info.connection = get_connection_list()
 	var client = get_parent().get_parent().get_node("rtree/client_debugger")
 	var ws:WebSocketClient = client.client as WebSocketClient
 	if  ws.get_connection_status() == 2:
@@ -325,6 +303,12 @@ func gui_input(event):
 
 		if  event.scancode == KEY_F  and not event.pressed and event.control:
 			focus_selected()
+			hint("Focus Node")
+			accept_event()
+
+		if  event.scancode == KEY_J  and not event.pressed and event.control:
+			jump_to_sourcecode()
+			hint("Jump To Sourcecode")
 			accept_event()
 		return
 
@@ -339,6 +323,20 @@ func gui_input(event):
 			accept_event()
 			hint("Zoom Out")
 			return
+	return
+
+var callable = preload("res://addons/btree/Editor/general_fcall/general_fcall.gd")
+func jump_to_sourcecode():
+	if  selected is callable:
+		var fn:String = selected.get_data().fn
+		var split:Array = data.get_parent().get_script().source_code.split("\n")
+		var selected_line = 0
+		for code_line in range(split.size()):
+			var current_line:String = split[code_line]
+			if  current_line.similarity(fn) > split[selected_line].similarity(fn):
+				selected_line = code_line
+		editor_interface.edit_resource(data.get_parent().get_script())
+		editor_interface.get_script_editor().goto_line(selected_line)
 	return
 
 var selected:Node
@@ -648,4 +646,39 @@ func _on_debug_pressed():
 
 func _on_help_pressed():
 	get_parent().get_parent().help()
+	return
+
+func create_snapshot():
+	var info = {}
+	info.nodes = []
+	for i in get_children():
+		if  i is GraphNode:
+			var node = Dictionary()
+			node["name"] = i.name
+			node["type"] = i.type
+			node["data"] = i.get_data()
+			info.nodes.append(node)
+	var root = find("root", info.nodes)
+	build_tree(root, get_connection_list(), info.nodes)
+	info.root = root
+	info.connection = get_connection_list()
+	return info
+
+func load_snapshot(data):
+	clear_editor()
+	load_from(data)
+	return
+
+func load_from(data):
+	var nodes = data.nodes
+	var conn = data.connection
+	for n in nodes:
+		if  n.type == Runtime.TNodeTypes.ROOT:
+			var node = get_node("root")
+			node.set_data(n.data)
+		else:
+			var node = create_node(n)
+			add_child(node)
+	for c in data.connection:
+		connect_node(c.from, c.from_port, c.to, c.to_port)
 	return
