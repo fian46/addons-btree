@@ -1,7 +1,6 @@
 [gd_scene format=2]
 
 [node name="help" type="WindowDialog"]
-visible = true
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -30,6 +29,7 @@ size_flags_horizontal = 3
 text = "Control + F = Focus to selected node
 Control + S = Save
 Control + Shift + Mouse Scroll = Zoom In/Out
+(Select a callable node) and Control + Shift + J = Jump To SourceCode
 (Select a node) and Control + Shift + C = Duplicate Recursive
 (Select a node) and Control + Shift + X = Delete Recursive
 (Select a node) and Control + Shift + Space = Move Recursive
