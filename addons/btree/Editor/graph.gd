@@ -31,20 +31,20 @@ func reload():
 	return
 
 func node_has_task():
-	var ml = data.get_parent().get_method_list()
+	var ml = root_object.get_method_list()
 	for m in ml:
 		if  m.name.begins_with("task_") and m.args.size() == 1:
 			return true
 	return false
 
 func node_has_script():
-	var pscript:GDScript = data.get_parent().get_script()
+	var pscript:GDScript = root_object.get_script()
 	if  not pscript:
 		return false
 	return true
 
 func valid_script():
-	var pscript:GDScript = data.get_parent().get_script()
+	var pscript:GDScript = root_object.get_script()
 	if  not pscript:
 		return false
 	var cscript:GDScript = GDScript.new()
@@ -62,7 +62,7 @@ func clear_data():
 func load_data(ndata, ncontrol):
 	data = ndata
 	control = ncontrol
-	root_object = data.get_parent()
+	root_object = data.get_node(data.blackboard)
 	return
 
 func clear_editor():
