@@ -2,14 +2,13 @@ tool
 extends GraphNode
 
 const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
-
 var type = -1
+var undo_redo:UndoRedo
 
 func _ready():
 	$slot0/Add.connect("pressed", self, "add_pressed")
 	$slot0/Del.connect("pressed", self, "del_pressed")
 	connect("close_request", self, "close_request")
-	connect("resize_request", self, "resize_request")
 	return
 
 func _enter_tree():
@@ -53,15 +52,11 @@ func label():
 	return l
 
 func add_pressed():
-	add_child(label())
-	set_slot(get_child_count() - 1, false, 0, Color.blue, true, 0, Color.blue, null, null)
+	get_parent().gd_add_slot(name)
 	return
 
 func del_pressed():
-	if  get_child_count() > 1:
-		get_parent().slot_removed(name, get_connection_output_count() - 1)
-		clear_slot(get_child_count() - 1)
-		remove_child(get_child(get_child_count()-1))
+	get_parent().gd_del_slot(name)
 	return
 
 func get_data():
@@ -88,8 +83,4 @@ func set_data(data):
 
 func close_request():
 	get_parent().child_delete(self)
-	return
-
-func resize_request(new_minsize):
-	rect_size = new_minsize
 	return

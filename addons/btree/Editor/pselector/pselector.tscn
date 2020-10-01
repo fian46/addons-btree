@@ -35,7 +35,5 @@ margin_left = 100.0
 margin_right = 117.0
 margin_bottom = 20.0
 text = "-"
-[connection signal="close_request" from="." to="." method="_on_priority_selector_close_request"]
-[connection signal="resize_request" from="." to="." method="_on_priority_selector_resize_request"]
 [connection signal="pressed" from="Control/Add" to="." method="_on_Add_pressed"]
 [connection signal="pressed" from="Control/Del" to="." method="_on_Del_pressed"]

@@ -5,9 +5,12 @@ const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
 
 const type = Runtime.TNodeTypes.PRIORITY_SELECTOR
 
+func _ready():
+	connect("close_request", self, "close_request")
+	return
+
 func _on_Add_pressed():
-	add_child(label())
-	set_slot(get_child_count() - 1, false, 0, Color.blue, true, 1, Color.yellow, null, null)
+	get_parent().ps_add_slot(name)
 	return
 
 func label():
@@ -17,10 +20,7 @@ func label():
 	return l
 
 func _on_Del_pressed():
-	if  get_child_count() > 1:
-		get_parent().slot_removed(name, get_connection_output_count() - 1)
-		clear_slot(get_child_count() - 1)
-		remove_child(get_child(get_child_count()-1))
+	get_parent().ps_del_slot(name)
 	return
 
 func _enter_tree():
@@ -49,10 +49,6 @@ func set_data(data):
 		set_slot(get_child_count() - 1, false, 0, Color.blue, true, 1, Color.yellow, null, null)
 	return
 
-func _on_priority_selector_resize_request(new_minsize):
-	rect_size = new_minsize
-	return
-
-func _on_priority_selector_close_request():
+func close_request():
 	get_parent().child_delete(self)
 	return

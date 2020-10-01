@@ -83,6 +83,7 @@ var repeat_scene = preload("res://addons/btree/Editor/repeat/repeat.tscn")
 var wait_scene = preload("res://addons/btree/Editor/wait_node/wait_node.tscn")
 var general_fcall_scene = preload("res://addons/btree/Editor/general_fcall/general_fcall.tscn")
 var general_decorator_scene = preload("res://addons/btree/Editor/general_decorator/general_decorator.tscn")
+var general_decorator_script = preload("res://addons/btree/Editor/general_decorator/general_decorator.gd")
 var general_fcall_class = preload("res://addons/btree/Editor/general_fcall/general_fcall.gd")
 var minim_scene = preload("res://addons/btree/Editor/minim_node/minim_node.tscn")
 var inverter_scene = preload("res://addons/btree/Editor/inverter/inverter.tscn")
@@ -100,110 +101,170 @@ func build_tree_from_data():
 	return
 
 func create_node(n):
+	var node
 	if  n.type == Runtime.TNodeTypes.TASK:
-		var task = general_fcall_scene.instance()
-		task.as_task()
-		task.name = n.name
-		task.set_data(n.data)
-		return task
+		node = general_fcall_scene.instance()
+		node.as_task()
+		node.name = n.name
+		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.SEQUENCE:
-		var seq = general_decorator_scene.instance()
-		seq.as_sequence()
-		seq.name = n.name
-		seq.set_data(n.data)
-		return seq
+		node = general_decorator_scene.instance()
+		node.as_sequence()
+		node.name = n.name
+		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.SELECTOR:
-		var sel = general_decorator_scene.instance()
-		sel.as_selector()
-		sel.name = n.name
-		sel.set_data(n.data)
-		return sel
+		node = general_decorator_scene.instance()
+		node.as_selector()
+		node.name = n.name
+		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.PRIORITY_SELECTOR:
-		var pse = pselector_scene.instance()
-		pse.name = n.name
-		pse.set_data(n.data)
-		return pse
+		node = pselector_scene.instance()
+		node.name = n.name
+		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.PRIORITY_CONDITION:
-		var inst = general_fcall_scene.instance()
-		inst.as_priority_condition()
-		inst.name = n.name
-		inst.set_data(n.data)
-		return inst
+		node = general_fcall_scene.instance()
+		node.as_priority_condition()
+		node.name = n.name
+		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.PARALEL:
-		var par = general_decorator_scene.instance()
-		par.as_paralel()
-		par.name = n.name
-		par.set_data(n.data)
-		return par
+		node = general_decorator_scene.instance()
+		node.as_paralel()
+		node.name = n.name
+		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.MUTE:
-		var mute = mute_scene.instance()
-		mute.name = n.name
-		mute.set_data(n.data)
-		return mute
+		node = mute_scene.instance()
+		node.name = n.name
+		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.REPEAT:
-		var rep = repeat_scene.instance()
-		rep.name = n.name
-		rep.set_data(n.data)
-		return rep
+		node = repeat_scene.instance()
+		node.name = n.name
+		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.WHILE:
-		var whi = general_fcall_scene.instance()
-		whi.as_while()
-		whi.name = n.name
-		whi.set_data(n.data)
-		return whi
+		node = general_fcall_scene.instance()
+		node.as_while()
+		node.name = n.name
+		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.WAIT:
-		var w = wait_scene.instance()
-		w.name = n.name
-		w.set_data(n.data)
-		return w
+		node = wait_scene.instance()
+		node.name = n.name
+		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.RACE:
-		var r = general_decorator_scene.instance()
-		r.as_race()
-		r.name = n.name
-		r.set_data(n.data)
-		return r
+		node = general_decorator_scene.instance()
+		node.as_race()
+		node.name = n.name
+		node.set_data(n.data)
 	elif  n.type == Runtime.TNodeTypes.RANDOM_SELECTOR:
-		var r = general_decorator_scene.instance()
-		r.as_random_selector()
-		r.name = n.name
-		r.set_data(n.data)
-		return r
+		node = general_decorator_scene.instance()
+		node.as_random_selector()
+		node.name = n.name
+		node.set_data(n.data)
 	elif  n.type == Runtime.TNodeTypes.RANDOM_SEQUENCE:
-		var r = general_decorator_scene.instance()
-		r.as_random_sequence()
-		r.name = n.name
-		r.set_data(n.data)
-		return r
+		node = general_decorator_scene.instance()
+		node.as_random_sequence()
+		node.name = n.name
+		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.INVERTER:
-		var r = inverter_scene.instance()
-		r.name = n.name
-		r.set_data(n.data)
-		return r
+		node = inverter_scene.instance()
+		node.name = n.name
+		node.set_data(n.data)
 	elif  n.type == Runtime.TNodeTypes.MINIM:
-		var m = minim_scene.instance()
-		m.name = n.name
-		m.set_data(n.data)
-		return m
-	return null
+		node = minim_scene.instance()
+		node.name = n.name
+		node.set_data(n.data)
+	(node as GraphNode).connect("dragged", self, "node_dragged", [node])
+	(node as GraphNode).connect("resize_request", self, "resize_request", [node])
+	if  node is general_decorator_script:
+		node.undo_redo = undo_redo
+	return node
+
+func snapc_vec(size):
+	size.x /= snap_distance
+	size.y /= snap_distance
+	size.x = ceil(size.x)
+	size.y = ceil(size.y)
+	size *= snap_distance
+	return size
+
+func resize_request(nsize:Vector2, node:GraphNode):
+	var size = snapc_vec(nsize)
+	var snap = snapc_vec(node.rect_size)
+	var fit = true
+	var temp = node.rect_size
+	node.rect_size = size
+	fit = node.rect_size.is_equal_approx(size)
+	node.rect_size = temp
+	if  not fit:
+		node.rect_size = Vector2.ZERO
+		size = snapc_vec(node.rect_size)
+		node.rect_size = temp
+	if  not size.is_equal_approx(snap):
+		undo_redo.create_action("node resize")
+		undo_redo.add_do_method(self, "update_node_rect_size", node.name, size)
+		undo_redo.add_undo_method(self, "update_node_rect_size", node.name, node.rect_size)
+		undo_redo.commit_action()
+	return
+
+func update_node_rect_size(node_name, size):
+	var node:GraphNode = get_node_or_null(node_name)
+	if  node:
+		node.rect_size = size
+		if  not node.rect_size.is_equal_approx(size):
+			node.rect_size = snapc_vec(node.rect_size)
+	return
 
 func connection_request(from, from_slot, to, to_slot):
 	if  from == to:
 		return
+	var dc = []
 	for i in get_connection_list():
 		if  from == i.from and from_slot == i.from_port:
-			disconnect_node(i.from, i.from_port, i.to, i.to_port)
+			dc.append([i.from, i.from_port, i.to, i.to_port])
 		if  to == i.to and to_slot == i.to_port:
-			disconnect_node(i.from, i.from_port, i.to, i.to_port)
-	connect_node(from, from_slot, to, to_slot)
+			dc.append([i.from, i.from_port, i.to, i.to_port])
+	undo_redo.create_action("connect_node")
+#	redo
+	for i in dc:
+		undo_redo.add_do_method(self, "disconnect_node", i[0], i[1], i[2], i[3])
+	undo_redo.add_do_method(self, "connect_node", from, from_slot, to, to_slot)
+#	undo
+	undo_redo.add_undo_method(self, "disconnect_node", from, from_slot, to, to_slot)
+	for i in dc:
+		undo_redo.add_undo_method(self, "connect_node", i[0], i[1], i[2], i[3])
+	undo_redo.commit_action()
 	return
 
 func child_delete(node):
+	var cp = []
 	for i in get_connection_list():
-		if  node.name == i.from:
-			disconnect_node(i.from, i.from_port, i.to, i.to_port)
-		if  node.name == i.to:
-			disconnect_node(i.from, i.from_port, i.to, i.to_port)
-	node.queue_free()
+		if  node.name == i.from or node.name == i.to:
+			cp.append([i.from, i.from_port, i.to, i.to_port])
+	
+	var data = {}
+	data["name"] = node.name
+	data["type"] = node.type
+	data["data"] = node.get_data()
+	
+	undo_redo.create_action("delete node")
+	undo_redo.add_do_method(self, "remove_node", node.name, cp)
+	undo_redo.add_undo_method(self, "re_create_node", data, cp)
+	undo_redo.commit_action()
+	return
+
+func re_create_node(data, cp):
+	var node = create_node(data)
+	add_child(node)
+	for i in cp:
+		connect_node(i[0], i[1], i[2], i[3])
+	return
+
+func remove_node(node_name, cp):
+	for i in cp:
+		disconnect_node(i[0], i[1], i[2], i[3])
+	var node = get_node_or_null(node_name)
+	if node:
+		node.queue_free()
+	else:
+		print("NOT FOUND : ",node_name)
 	return
 
 func _on_save_pressed():
@@ -267,8 +328,93 @@ func find(name, nodes):
 	return null
 
 func disconnection_request(from, from_slot, to, to_slot):
-	disconnect_node(from, from_slot, to, to_slot)
+	undo_redo.create_action("disconnect_node")
+	undo_redo.add_do_method(self, "disconnect_node", from, from_slot, to, to_slot)
+	undo_redo.add_undo_method(self, "connect_node", from, from_slot, to, to_slot)
+	undo_redo.commit_action()
 	return
+
+func ps_add_slot(name):
+	undo_redo.create_action("add_slot")
+	undo_redo.add_do_method(self, "add_slot1", name)
+	undo_redo.add_undo_method(self, "del_slot", name)
+	undo_redo.commit_action()
+	return
+
+func ps_del_slot(name):
+	var node = get_node(name)
+	if  node.get_child_count() <= 1:
+		return
+	var port = node.get_connection_output_count() - 1
+	var con
+	for i in get_connection_list():
+		if  i.from == name and i.from_port == port:
+			con = i
+			break
+	undo_redo.create_action("remove_slot")
+	if  con:
+		undo_redo.add_do_method(self, "disconnect_node", con.from, con.from_port, con.to, con.to_port)
+	undo_redo.add_do_method(self, "del_slot", name)
+	undo_redo.add_undo_method(self, "add_slot1", name)
+	if  con:
+		undo_redo.add_undo_method(self, "connect_node", con.from, con.from_port, con.to, con.to_port)
+	undo_redo.commit_action()
+	return
+
+
+func gd_add_slot(name):
+	undo_redo.create_action("add_slot")
+	undo_redo.add_do_method(self, "add_slot", name)
+	undo_redo.add_undo_method(self, "del_slot", name)
+	undo_redo.commit_action()
+	return
+
+func gd_del_slot(name):
+	var node = get_node(name)
+	if  node.get_child_count() <= 1:
+		return
+	var port = node.get_connection_output_count() - 1
+	var con
+	for i in get_connection_list():
+		if  i.from == name and i.from_port == port:
+			con = i
+			break
+	undo_redo.create_action("remove_slot")
+	if  con:
+		undo_redo.add_do_method(self, "disconnect_node", con.from, con.from_port, con.to, con.to_port)
+	undo_redo.add_do_method(self, "del_slot", name)
+	undo_redo.add_undo_method(self, "add_slot", name)
+	if  con:
+		undo_redo.add_undo_method(self, "connect_node", con.from, con.from_port, con.to, con.to_port)
+	undo_redo.commit_action()
+	return
+
+func add_slot1(name):
+	var node:GraphNode = get_node(name)
+	node.add_child(label(name))
+	node.set_slot(node.get_child_count() - 1, false, 0, Color.blue, true, 1, Color.yellow, null, null)
+	return
+
+func add_slot(name):
+	var node:GraphNode = get_node(name)
+	node.add_child(label(name))
+	node.set_slot(node.get_child_count() - 1, false, 0, Color.blue, true, 0, Color.blue, null, null)
+	return
+
+func del_slot(name):
+	var node:GraphNode = get_node(name)
+	if  get_child_count() > 1:
+		node.clear_slot(node.get_child_count() - 1)
+		node.remove_child(node.get_child(node.get_child_count() - 1))
+		node.rect_size = Vector2.ZERO
+	return
+
+func label(name):
+	var node = get_node(name)
+	var l = Label.new()
+	l.align = Label.ALIGN_RIGHT
+	l.text = str(node.get_child_count())
+	return l
 
 func slot_removed(name, slot):
 	for i in get_connection_list():
@@ -353,7 +499,8 @@ func copy_node():
 		return
 
 	var root_offset = (scroll_offset / zoom) + (get_local_mouse_position() / zoom)
-
+	root_offset = snapc_vec(root_offset)
+	
 	var nodes = []
 	for i in get_children():
 		if  i is GraphNode:
@@ -363,37 +510,55 @@ func copy_node():
 				"data":i.get_data()
 			}
 			nodes.append(node)
+	
 	var cp = find(selected.name, nodes)
-
 	build_tree(cp, get_connection_list(), nodes)
 	nodes.clear()
 	rec_populate(cp, nodes)
-
-	var inst_node = []
-	var mapping = {}
+	
+	var nmap = {}
 	for i in nodes:
-		var inst = create_node(i)
-		var ori_name = inst.name
-		add_child(inst)
-		inst_node.append(inst)
-		var mapping_name = inst.name
-		mapping[ori_name] = mapping_name
-
-	var rinst = null
-	for i in inst_node:
-		if  i.name == mapping[cp.name]:
-			rinst = i
-			break
-
-	if  rinst:
-		var shifted = root_offset - rinst.offset
-		for i in inst_node:
-			i.offset += shifted
-
-	for i in nodes:
+		var tnode = create_node(i)
+		add_child(tnode)
+		nmap[i.name] = tnode.name
+	
+	for i in nmap.values():
+		var rm = get_node(i)
+		remove_child(rm)
+		rm.free()
+	
+	var con_pair = []
+	for n in nodes:
 		for j in get_connection_list():
-			if  i.name == j.from:
-				connect_node(mapping[j.from], j.from_port, mapping[j.to], j.to_port)
+			if  n.name == j.from:
+				con_pair.append([nmap[j.from], j.from_port, nmap[j.to], j.to_port])
+	
+	for i in nodes:
+		i.name = nmap[i.name]
+	var shifted = root_offset - selected.offset
+	undo_redo.create_action("recursive_copy")
+	undo_redo.add_do_method(self, "create_graph", nodes, con_pair, shifted)
+	undo_redo.add_undo_method(self, "delete_graph", nodes, con_pair)
+	undo_redo.commit_action()
+	return
+
+func delete_graph(nodes, con_pair):
+	for c in con_pair:
+		disconnect_node(c[0], c[1], c[2], c[3])
+	for n in nodes:
+		if  has_node(n.name):
+			var i = get_node(n.name)
+			remove_child(i)
+			i.free()
+	return
+
+func create_graph(nodes, con_pair, shifted):
+	for n in nodes:
+		var inst = create_node(n)
+		inst.offset += shifted
+		add_child(inst)
+	for c in con_pair:
+		connect_node(c[0], c[1], c[2], c[3])
 	return
 
 var minim_class = preload("res://addons/btree/Editor/minim_node/minim_node.gd")
@@ -411,9 +576,26 @@ func minimize_node():
 	if  selected.name == "root":
 		hint("Cannot Minimize \"root\" Node !")
 		return
-	var soffset = selected.offset
+	var tnode = minim_scene.instance()
+	add_child(tnode)
+	var target_name = tnode.name
+	remove_child(tnode)
+	tnode.free()
+	undo_redo.create_action("minim_node")
+	undo_redo.add_do_method(self, "do_minim", selected.name, target_name)
+	undo_redo.add_undo_method(self, "do_maxim", target_name)
+	undo_redo.commit_action()
+	return
+
+func do_minim(node_name, minim_name):
+	var mnode = get_node_or_null(node_name)
+	if  not mnode:
+		return
+	var soffset = mnode.offset
 	var m_inst = minim_scene.instance()
+	m_inst.connect("dragged", self, "node_dragged", [m_inst])
 	m_inst.offset = soffset
+	m_inst.name = minim_name
 	add_child(m_inst)
 
 	var nodes = []
@@ -426,7 +608,7 @@ func minimize_node():
 			}
 			nodes.append(node)
 
-	var cp = find(selected.name, nodes)
+	var cp = find(mnode.name, nodes)
 	build_tree(cp, get_connection_list(), nodes)
 	nodes.clear()
 	rec_populate(cp, nodes)
@@ -457,12 +639,12 @@ func minimize_node():
 			}
 			nodes.append(node)
 
-	var mroot = find(selected.name, nodes)
+	var mroot = find(mnode.name, nodes)
 	build_tree(mroot, get_connection_list(), nodes)
 	m_inst.data["root"] = mroot
 
 	for i in get_connection_list():
-		if  i.to == selected.name:
+		if  i.to == mnode.name:
 			disconnect_node(i.from, i.from_port, i.to, i.to_port)
 
 	if  current_connection:
@@ -480,12 +662,23 @@ func minimize_node():
 	return
 
 func maximize_node(minim):
-	var data  = minim.data
+	undo_redo.create_action("expand_minim")
+	undo_redo.add_do_method(self, "do_maxim", minim.name)
+	undo_redo.add_undo_method(self, "do_minim", minim.data.root.name, minim.name)
+	undo_redo.commit_action()
+	return
 
+func do_maxim(node_name):
+	var minim = get_node_or_null(node_name)
+	if  not minim:
+		return
+	
+	remove_child(minim)
+	var data  = minim.data
 	var connection = data.connection
 	var nodes = data.nodes
 	var root = data.root
-
+	
 	var inst_node = []
 	var mapping = {}
 	for i in nodes:
@@ -495,28 +688,28 @@ func maximize_node(minim):
 		inst_node.append(inst)
 		var mapping_name = inst.name
 		mapping[ori_name] = mapping_name
-
+	
 	var rinst = null
 	for i in inst_node:
 		if  i.name == mapping[root.name]:
 			rinst = i
 			break
-
+	
 	if  rinst:
 		var shifted = minim.offset - rinst.offset
 		for i in inst_node:
 			i.offset += shifted
-
+	
 	for i in nodes:
 		for j in connection:
 			if  i.name == j.from or i.name == j.to:
 				connect_node(mapping[j.from], j.from_port, mapping[j.to], j.to_port)
-
+	
 	for i in get_connection_list():
 		if  i.to == minim.name:
 			disconnect_node(i.from, i.from_port, i.to, i.to_port)
 			connect_node(i.from, i.from_port, rinst.name, 0)
-
+	
 	minim.queue_free()
 	selected = rinst
 	set_selected(rinst)
@@ -547,28 +740,61 @@ func rdelete_node():
 	build_tree(cp, get_connection_list(), nodes)
 	nodes.clear()
 	rec_populate(cp, nodes)
-
+	
+	var dcon = []
+	
 	for i in nodes:
 		for j in get_connection_list():
 			if  i.name == j.from or i.name == j.to:
-				disconnect_node(j.from, j.from_port, j.to, j.to_port)
-
+				dcon.append([j.from, j.from_port, j.to, j.to_port])
+	
+	var dnam = []
 	for i in nodes:
 		if  has_node(i.name):
-			var n = get_node(i.name)
-			n.free()
+			var node = get_node(i.name)
+			var data = {}
+			data["name"] = node.name
+			data["type"] = node.type
+			data["data"] = node.get_data()
+			dnam.append(data)
 	selected = null
+	
+	undo_redo.create_action("recursive_delete")
+	for i in dcon:
+		undo_redo.add_do_method(self, "disconnect_node", i[0], i[1], i[2], i[3])
+	for i in dnam:
+		undo_redo.add_do_method(self, "fnode", i)
+	
+	for i in dnam:
+		undo_redo.add_undo_method(self, "cnode", i)
+	for i in dcon:
+		undo_redo.add_undo_method(self, "connect_node", i[0], i[1], i[2], i[3])
+	undo_redo.commit_action()
+	return
+
+func cnode(ndata:Dictionary):
+	var node = create_node(ndata)
+	add_child(node)
+	return
+
+func fnode(ndata:Dictionary):
+	var node = get_node(ndata.name)
+	remove_child(node)
+	node.free()
 	return
 
 func rmove_node():
 	var root_offset = (scroll_offset / zoom) + (get_local_mouse_position() / zoom)
+	root_offset = snapc_vec(root_offset)
 	if  not selected:
 		hint("No Node Selected")
 		return
 	if  not selected.selected:
 		hint("No Node Selected")
 		return
-
+	if  (selected as GraphNode).offset.is_equal_approx(root_offset):
+		return
+	
 	var nodes = []
 	for i in get_children():
 		if  i is GraphNode:
@@ -578,22 +804,33 @@ func rmove_node():
 				"data":i.get_data()
 			}
 			nodes.append(node)
-
+	
 	var cp = find(selected.name, nodes)
 	build_tree(cp, get_connection_list(), nodes)
 	nodes.clear()
 	rec_populate(cp, nodes)
-
+	
 	if  not has_node(cp.name):
 		return
-
+	
 	var rn = get_node(cp.name)
 	var shifted = root_offset - rn.offset
-
+	
+	var shifted_name = []
 	for i in nodes:
 		if  has_node(i.name):
-			var n = get_node(i.name)
-			n.offset += shifted
+			shifted_name.append(i.name)
+	undo_redo.create_action("recursive_move")
+	undo_redo.add_do_method(self, "shift_nodes", shifted_name, shifted)
+	undo_redo.add_undo_method(self, "shift_nodes", shifted_name, -shifted)
+	undo_redo.commit_action()
+	return
+
+func shift_nodes(names, shifted):
+	for i in names:
+		if  has_node(i):
+			var node:GraphNode = get_node(i)
+			node.offset += shifted
 	return
 
 func rec_populate(root, nodes:Array):
@@ -637,7 +874,10 @@ func _on_search_bar_text_changed(new_text):
 export(NodePath) var create_path
 
 func popup_request(position):
-	get_node(create_path).get_popup().popup(Rect2(position, Vector2(1, 1)))
+	var create = get_node(create_path)
+	create.drop_offset = (scroll_offset / zoom) + (get_local_mouse_position() / zoom)
+	create.undo_redo = undo_redo
+	create.get_popup().popup(Rect2(position, Vector2(1, 1)))
 	return
 
 func _on_debug_pressed():
@@ -646,6 +886,33 @@ func _on_debug_pressed():
 
 func _on_help_pressed():
 	get_parent().get_parent().help()
+	return
+
+func _process(delta):
+	if  not dragged_nodes.empty():
+		var redo = []
+		var undo = []
+		for i in dragged_nodes:
+			undo.append([i[2], i[0]])
+			redo.append([i[2], i[1]])
+		undo_redo.create_action("node_drag")
+		undo_redo.add_do_method(self, "update_node_offset", redo)
+		undo_redo.add_undo_method(self, "update_node_offset", undo)
+		undo_redo.commit_action()
+		dragged_nodes.clear()
+	return
+
+func update_node_offset(node_offset):
+	for i in node_offset:
+		var n:GraphNode = get_node_or_null(i[0])
+		if  n:
+			n.offset = (i[1] / snap_distance) * snap_distance
+	return
+
+var dragged_nodes = []
+func node_dragged(start, end, node):
+	var event = [start, end, node.name]
+	dragged_nodes.append(event)
 	return
 
 func create_snapshot():
@@ -677,8 +944,94 @@ func load_from(data):
 			var node = get_node("root")
 			node.set_data(n.data)
 		else:
-			var node = create_node(n)
+			var node:GraphNode = create_node(n)
 			add_child(node)
 	for c in data.connection:
 		connect_node(c.from, c.from_port, c.to, c.to_port)
+	return
+
+var param_scene = preload("res://addons/btree/Editor/task/param.tscn")
+
+func add_param(name):
+	undo_redo.create_action("add_param")
+	undo_redo.add_do_method(self, "add_last", name)
+	undo_redo.add_do_method(self, "sync_data_and_node", name)
+	undo_redo.add_undo_method(self, "del_last", name)
+	undo_redo.add_undo_method(self, "sync_data_and_node", name)
+	undo_redo.commit_action()
+	return
+
+func add_last(name):
+	var node = get_node(name)
+	node.params.clear()
+	var np = node.get_node("Params")
+	for i in np.get_children():
+		node.params.append(i.get_value())
+	node.params.append(["", 1])
+	return
+
+func del_last(name):
+	var node = get_node(name)
+	node.params.clear()
+	var np = node.get_node("Params")
+	for i in np.get_children():
+		node.params.append(i.get_value())
+	node.params.pop_back()
+	return
+
+func sync_data_and_node(name):
+	var node = get_node(name)
+	var params:Array = node.params
+	var target = node.get_node("Params")
+	while params.size() > target.get_child_count():
+		var inst = param_scene.instance()
+		inst.connect("remove_me", node, "remove_param")
+		target.add_child(inst)
+	while params.size() < target.get_child_count():
+		var del = target.get_child(0)
+		target.remove_child(del)
+		del.queue_free()
+	for i in range(params.size()):
+		var sel = target.get_child(i)
+		sel.set_value(params[i])
+		sel.update_label()
+	node.rect_size = Vector2.ZERO
+	return
+
+func del_param(name, index):
+	var node = get_node(name)
+	var np = node.get_node("Params")
+	var params:Array = node.params
+	params.clear()
+	for i in np.get_children():
+		params.append(i.get_value())
+	
+	var old_value = params[index]
+	
+	undo_redo.create_action("remove_param")
+	undo_redo.add_do_method(self, "cls_index", name, index)
+	undo_redo.add_do_method(self, "sync_data_and_node", name)
+	undo_redo.add_undo_method(self, "ins_index", name, index, old_value)
+	undo_redo.add_undo_method(self, "sync_data_and_node", name)
+	undo_redo.commit_action()
+	return
+
+func cls_index(name, index):
+	var node = get_node(name)
+	var np = node.get_node("Params")
+	var params:Array = node.params
+	params.clear()
+	for i in np.get_children():
+		params.append(i.get_value())
+	params.remove(index)
+	return
+
+func ins_index(name, index, value):
+	var node = get_node(name)
+	var np = node.get_node("Params")
+	var params:Array = node.params
+	params.clear()
+	for i in np.get_children():
+		params.append(i.get_value())
+	params.insert(index, value)
 	return

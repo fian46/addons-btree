@@ -2,6 +2,7 @@ tool
 extends MenuButton
 
 var pop = null
+var undo_redo:UndoRedo = null
 
 const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
 const error_no_task = "No function start with \"task_*(task)\" please create one !"
@@ -13,13 +14,46 @@ var wait_scene = preload("res://addons/btree/Editor/wait_node/wait_node.tscn")
 var general_fcall_scene = preload("res://addons/btree/Editor/general_fcall/general_fcall.tscn")
 var general_decorator_scene = preload("res://addons/btree/Editor/general_decorator/general_decorator.tscn")
 var inverter = preload("res://addons/btree/Editor/inverter/inverter.tscn")
+var general_decorator_script = preload("res://addons/btree/Editor/general_decorator/general_decorator.gd")
 var pop_pos = Vector2.ZERO
 export(NodePath) var graph_path:NodePath
 export(NodePath) var hint_path:NodePath
+var drop_offset = Vector2.ZERO
 
 func id_pressed(id):
 	var graph = get_node(graph_path)
 	var zoom =  graph.zoom
+	var test_node = create_node(id)
+	graph.add_child(test_node)
+	var generated_name = test_node.name
+	graph.remove_child(test_node)
+	test_node.queue_free()
+	undo_redo.create_action("add_node")
+	undo_redo.add_do_method(self, "add_node", id, generated_name, drop_offset)
+	undo_redo.add_undo_method(self, "del_node", generated_name)
+	undo_redo.commit_action()
+	return
+
+func add_node(id, name, offset):
+	var graph = get_node(graph_path)
+	var node = create_node(id)
+	node.name = name
+	node.offset = offset
+	(node as GraphNode).connect("dragged", graph, "node_dragged", [node])
+	(node as GraphNode).connect("resize_request", graph, "resize_request", [node])
+	if  node is general_decorator_script:
+		node.undo_redo = undo_redo
+	graph.add_child(node)
+	return
+
+func del_node(gname):
+	var graph = get_node(graph_path)
+	var node = graph.get_node_or_null(gname)
+	node.queue_free()
+	return
+
+func create_node(id):
+	var graph = get_node(graph_path)
 	var inst = null
 	match id:
 		Runtime.TNodeTypes.TASK:
@@ -68,9 +102,7 @@ func id_pressed(id):
 			inst.as_random_sequence()
 		Runtime.TNodeTypes.INVERTER:
 			inst = inverter.instance()
-	inst.offset = (graph.scroll_offset / zoom) + (graph.get_local_mouse_position() / zoom)
-	graph.add_child(inst)
-	return
+	return inst
 
 func _ready():
 	pop = get_popup()
@@ -87,7 +119,7 @@ func _ready():
 	pop.add_item("While Node", Runtime.TNodeTypes.WHILE)
 	pop.add_item("Wait Node", Runtime.TNodeTypes.WAIT)
 	pop.add_item("Race Node", Runtime.TNodeTypes.RACE)
-	pop.add_item("Random Selector", Runtime.TNodeTypes.SELECTOR)
-	pop.add_item("Random Sequence", Runtime.TNodeTypes.SEQUENCE)
+	pop.add_item("Random Selector", Runtime.TNodeTypes.RANDOM_SELECTOR)
+	pop.add_item("Random Sequence", Runtime.TNodeTypes.RANDOM_SEQUENCE)
 	pop.add_item("Inverter", Runtime.TNodeTypes.INVERTER)
 	return

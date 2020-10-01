@@ -19,6 +19,9 @@ slot/0/right_enabled = true
 slot/0/right_type = 0
 slot/0/right_color = Color( 0, 0.0862745, 1, 1 )
 script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="slot0" type="HBoxContainer" parent="."]
 margin_left = 16.0
@@ -36,7 +39,6 @@ text = "Count : "
 margin_left = 53.0
 margin_right = 127.0
 margin_bottom = 24.0
+size_flags_horizontal = 3
 allow_greater = true
 script = ExtResource( 2 )
-[connection signal="close_request" from="." to="." method="_on_repeat_close_request"]
-[connection signal="resize_request" from="." to="." method="_on_repeat_resize_request"]
