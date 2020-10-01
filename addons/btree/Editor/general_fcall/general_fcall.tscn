@@ -55,6 +55,7 @@ text = "Function Name : "
 margin_left = 113.0
 margin_right = 142.0
 margin_bottom = 20.0
+size_flags_horizontal = 3
 
 [node name="Input" type="HBoxContainer" parent="."]
 margin_left = 16.0

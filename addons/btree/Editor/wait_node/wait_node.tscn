@@ -36,5 +36,6 @@ text = "Count : "
 margin_left = 53.0
 margin_right = 127.0
 margin_bottom = 24.0
+size_flags_horizontal = 3
 allow_greater = true
 script = ExtResource( 2 )
