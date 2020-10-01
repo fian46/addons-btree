@@ -29,7 +29,3 @@ func set_data(data):
 	offset = data.offset
 	$slot0/count.call_deferred("set_value", data.count)
 	return
-
-func _on_count_value_changed(value):
-	print($slot0/count.value, " ", value)
-	return

@@ -38,4 +38,3 @@ margin_right = 127.0
 margin_bottom = 24.0
 allow_greater = true
 script = ExtResource( 2 )
-[connection signal="value_changed" from="slot0/count" to="." method="_on_count_value_changed"]
