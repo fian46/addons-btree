@@ -18,18 +18,15 @@ margin_bottom = 14.0
 size_flags_vertical = 0
 text = "0 : "
 
-[node name="TextEdit" type="TextEdit" parent="."]
+[node name="text_value" type="LineEdit" parent="."]
 margin_left = 24.0
-margin_right = 124.0
-margin_bottom = 40.0
-rect_min_size = Vector2( 100, 40 )
+margin_right = 122.0
+margin_bottom = 24.0
 size_flags_horizontal = 3
-size_flags_vertical = 3
-wrap_enabled = true
 
 [node name="OptionButton" type="OptionButton" parent="."]
-margin_left = 128.0
-margin_right = 184.0
+margin_left = 126.0
+margin_right = 182.0
 margin_bottom = 20.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
@@ -38,12 +35,11 @@ items = [ "Number", null, false, 0, null, "Text", null, false, 1, null ]
 selected = 1
 
 [node name="Button" type="Button" parent="."]
-margin_left = 188.0
-margin_right = 208.0
+margin_left = 186.0
+margin_right = 206.0
 margin_bottom = 20.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
 text = "X"
-[connection signal="focus_exited" from="TextEdit" to="." method="_on_TextEdit_focus_exited"]
 [connection signal="item_selected" from="OptionButton" to="." method="_on_OptionButton_item_selected"]
 [connection signal="pressed" from="Button" to="." method="_on_Button_pressed"]

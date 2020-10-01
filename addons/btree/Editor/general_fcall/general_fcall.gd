@@ -2,16 +2,13 @@ tool
 extends GraphNode
 
 const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
-
 var type = Runtime.TNodeTypes.TASK
 var load_function = ""
 var params = []
 var param_scene = preload("res://addons/btree/Editor/task/param.tscn")
 
-
 func _ready():
 	connect("close_request", self, "self_close")
-	connect("resize_request", self, "self_resize")
 	$Input/Add.connect("pressed", self, "add_pressed")
 	return
 
@@ -34,10 +31,10 @@ func _enter_tree():
 			opt.selected = 0
 	for i in params:
 		var input = param_scene.instance()
-		input.set_id($Params.get_child_count())
 		input.connect("remove_me", self, "remove_param")
 		input.call_deferred("set_value", i)
 		$Params.add_child(input)
+		input.update_label()
 	return
 
 func as_task():
@@ -55,10 +52,6 @@ func as_while():
 	name = "while_node"
 	type = Runtime.TNodeTypes.WHILE
 	set_slot(0, true, 0, Color.blue, true, 0, Color.blue)
-	return
-
-func self_resize(new_minsize):
-	rect_size = new_minsize
 	return
 
 func update():
@@ -129,14 +122,9 @@ func get_data():
 	return ret_data
 
 func add_pressed():
-	var input = param_scene.instance()
-	input.set_id($Params.get_child_count())
-	input.connect("remove_me", self, "remove_param")
-	$Params.add_child(input)
+	get_parent().add_param(name)
 	return
 
 func remove_param(param):
-	$Params.remove_child(param)
-	for i in range($Params.get_child_count()):
-		$Params.get_child(i).set_id(i)
+	get_parent().del_param(name, param.get_index())
 	return

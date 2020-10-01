@@ -2,8 +2,11 @@ tool
 extends GraphNode
 
 const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
-
 const type = Runtime.TNodeTypes.INVERTER
+
+func _ready():
+	connect("close_request", self, "close_request")
+	return
 
 func _enter_tree():
 	title = name
@@ -20,10 +23,6 @@ func set_data(data):
 	offset = data.offset
 	return
 
-func _on_inverter_close_request():
+func close_request():
 	get_parent().child_delete(self)
-	return
-
-func _on_inverter_resize_request(new_minsize):
-	rect_size = new_minsize
 	return

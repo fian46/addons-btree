@@ -21,9 +21,7 @@ __meta__ = {
 }
 
 [node name="slot0" type="Label" parent="."]
-margin_left = 32.0
-margin_top = 48.0
-margin_right = 144.0
-margin_bottom = 73.0
-[connection signal="close_request" from="." to="." method="_on_inverter_close_request"]
-[connection signal="resize_request" from="." to="." method="_on_inverter_resize_request"]
+margin_left = 16.0
+margin_top = 24.0
+margin_right = 79.0
+margin_bottom = 38.0
