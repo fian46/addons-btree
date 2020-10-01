@@ -521,8 +521,11 @@ func copy_node():
 		var tnode = create_node(i)
 		add_child(tnode)
 		nmap[i.name] = tnode.name
-		remove_child(tnode)
-		tnode.free()
+	
+	for i in nmap.values():
+		var rm = get_node(i)
+		remove_child(rm)
+		rm.free()
 	
 	var con_pair = []
 	for n in nodes:
