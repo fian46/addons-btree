@@ -2,10 +2,10 @@ tool
 extends GraphNode
 
 const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
-
 const type = Runtime.TNodeTypes.WAIT
 
 func _ready():
+	connect("close_request", self, "close_request")
 	$slot0/count.value = 0
 	return
 
@@ -13,11 +13,7 @@ func _enter_tree():
 	title = name
 	return
 
-func _on_wait_node_resize_request(new_minsize):
-	rect_size = new_minsize
-	return
-
-func _on_wait_node_close_request():
+func close_request():
 	get_parent().child_delete(self)
 	return
 
