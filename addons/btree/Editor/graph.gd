@@ -852,24 +852,49 @@ func focus_selected():
 	scroll_offset = selected.offset * zoom - ((rect_size / 2) - (selected.rect_size / 2))
 	return
 
+var tindex = 0
+var search_text = ""
+
 func _on_search_bar_text_changed(new_text):
-	var most_similar:Node = null
+	tindex = 0
+	search_text = new_text
+	var tpairs = comp_pairs(new_text)
+	if  not tpairs.empty():
+		var si = tpairs[tindex][1]
+		scroll_offset = si.offset * zoom - ((rect_size / 2) - (si.rect_size / 2))
+	return
+
+func _on_next_pressed():
+	tindex += 1
+	var tpairs = comp_pairs(search_text)
+	if  not tpairs.empty():
+		tindex = clamp(tindex, 0, tpairs.size() - 1)
+		var si = tpairs[tindex][1]
+		scroll_offset = si.offset * zoom - ((rect_size / 2) - (si.rect_size / 2))
+	return
+
+func _on_prev_pressed():
+	tindex -= 1
+	var tpairs = comp_pairs(search_text)
+	if  not tpairs.empty():
+		tindex = clamp(tindex, 0, tpairs.size() - 1)
+		var si = tpairs[tindex][1]
+		scroll_offset = si.offset * zoom - ((rect_size / 2) - (si.rect_size / 2))
+	return
+
+func comp_pairs(text):
+	var tpairs = []
 	for i in get_children():
 		if  i is GraphNode:
-			if  most_similar == null:
-				most_similar = i
-			else:
-				var itoken = i.name
-				var mtoken = most_similar.name
-				if  i is general_fcall_class or i is minim_class:
-					itoken = i.search_token()
-				if  most_similar is general_fcall_class:
-					mtoken = most_similar.search_token()
-				if  mtoken.similarity(new_text) < itoken.similarity(new_text):
-					most_similar = i
-	if  most_similar:
-		scroll_offset = most_similar.offset * zoom - ((rect_size / 2) - (most_similar.rect_size / 2))
-	return
+			var itoken = i.name
+			if  i is general_fcall_class or i is minim_class:
+				itoken = i.search_token()
+			tpairs.append([itoken.similarity(text), i])
+	tpairs.sort_custom(self, "sort_tp")
+	return tpairs
+
+func sort_tp(a, b):
+	return a[0] > b[0]
 
 export(NodePath) var create_path
 
