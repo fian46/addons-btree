@@ -12,13 +12,13 @@ __meta__ = {
 }
 
 [node name="group" type="HBoxContainer" parent="."]
-margin_right = 320.0
+margin_right = 348.0
 margin_bottom = 20.0
 alignment = 2
 
 [node name="create" type="MenuButton" parent="group"]
-margin_left = 119.0
-margin_right = 172.0
+margin_left = 147.0
+margin_right = 200.0
 margin_bottom = 20.0
 text = "Create"
 items = [ "Task", null, 0, false, false, 1, 0, null, "", false, "Selector", null, 0, false, false, 3, 0, null, "", false, "Sequence", null, 0, false, false, 2, 0, null, "", false, "Priority Selector", null, 0, false, false, 4, 0, null, "", false, "Priority Condition", null, 0, false, false, 5, 0, null, "", false, "Paralel", null, 0, false, false, 6, 0, null, "", false, "Mute", null, 0, false, false, 7, 0, null, "", false, "Repeat", null, 0, false, false, 8, 0, null, "", false, "While Node", null, 0, false, false, 9, 0, null, "", false, "Wait Node", null, 0, false, false, 10, 0, null, "", false, "Race Node", null, 0, false, false, 11, 0, null, "", false, "Random Selector", null, 0, false, false, 12, 0, null, "", false, "Random Sequence", null, 0, false, false, 13, 0, null, "", false, "Inverter", null, 0, false, false, 14, 0, null, "", false ]
@@ -27,26 +27,26 @@ graph_path = NodePath("../../graph")
 hint_path = NodePath("../../footer/hint")
 
 [node name="save" type="Button" parent="group"]
-margin_left = 176.0
-margin_right = 217.0
+margin_left = 204.0
+margin_right = 245.0
 margin_bottom = 20.0
 text = "Save"
 
 [node name="debug" type="Button" parent="group"]
-margin_left = 221.0
-margin_right = 274.0
+margin_left = 249.0
+margin_right = 302.0
 margin_bottom = 20.0
 text = "Debug"
 
 [node name="help" type="Button" parent="group"]
-margin_left = 278.0
-margin_right = 320.0
+margin_left = 306.0
+margin_right = 348.0
 margin_bottom = 20.0
 text = "Help"
 
 [node name="graph" type="GraphEdit" parent="."]
 margin_top = 24.0
-margin_right = 320.0
+margin_right = 348.0
 margin_bottom = 152.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -70,7 +70,7 @@ title = "root"
 
 [node name="footer" type="HBoxContainer" parent="."]
 margin_top = 156.0
-margin_right = 320.0
+margin_right = 348.0
 margin_bottom = 180.0
 alignment = 1
 __meta__ = {
@@ -79,14 +79,13 @@ __meta__ = {
 
 [node name="hint" type="Label" parent="footer"]
 margin_top = 5.0
-margin_right = 20.0
 margin_bottom = 19.0
 size_flags_horizontal = 3
 size_flags_vertical = 6
 
 [node name="search" type="HBoxContainer" parent="footer"]
-margin_left = 24.0
-margin_right = 320.0
+margin_left = 4.0
+margin_right = 348.0
 margin_bottom = 24.0
 
 [node name="Label" type="Label" parent="footer/search"]
@@ -102,6 +101,18 @@ margin_bottom = 24.0
 rect_min_size = Vector2( 200, 0 )
 caret_blink = true
 caret_blink_speed = 0.5
+
+[node name="prev" type="Button" parent="footer/search"]
+margin_left = 300.0
+margin_right = 320.0
+margin_bottom = 24.0
+text = "<"
+
+[node name="next" type="Button" parent="footer/search"]
+margin_left = 324.0
+margin_right = 344.0
+margin_bottom = 24.0
+text = ">"
 [connection signal="pressed" from="group/save" to="graph" method="_on_save_pressed"]
 [connection signal="pressed" from="group/debug" to="graph" method="_on_debug_pressed"]
 [connection signal="pressed" from="group/help" to="graph" method="_on_help_pressed"]
@@ -111,3 +122,5 @@ caret_blink_speed = 0.5
 [connection signal="node_selected" from="graph" to="graph" method="node_selected"]
 [connection signal="popup_request" from="graph" to="graph" method="popup_request"]
 [connection signal="text_changed" from="footer/search/search_bar" to="graph" method="_on_search_bar_text_changed"]
+[connection signal="pressed" from="footer/search/prev" to="graph" method="_on_prev_pressed"]
+[connection signal="pressed" from="footer/search/next" to="graph" method="_on_next_pressed"]
