@@ -94,6 +94,7 @@ func _enter_tree():
 	return
 
 func fs_reload(names):
+	dock.halt(null)
 	var graph = dock.get_node("editor/graph")
 	var selection = get_editor_interface().get_selection().get_selected_nodes()
 	if  selection.size() == 1:

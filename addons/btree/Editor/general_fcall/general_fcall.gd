@@ -68,8 +68,18 @@ func update():
 	if  old_sel >= 0:
 		old_tsel = opt.get_item_text(old_sel)
 	
+	var script = get_parent().root_object.get_script()
+	var path = script.resource_path
+	var file = File.new()
+	file.open(path, File.READ)
+	var source = file.get_as_text()
+	file.close()
+	var lscript:GDScript = GDScript.new()
+	lscript.set_source_code(source)
+	lscript.reload()
+	
 	var tm = []
-	var ml = get_parent().root_object.get_method_list()
+	var ml = lscript.get_script_method_list()
 	for m in ml:
 		if  m.name.begins_with("task_") and m.args.size() == 1:
 			tm.append(m.name)

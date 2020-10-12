@@ -49,8 +49,14 @@ func valid_script():
 	var pscript:GDScript = data.get_parent().get_script()
 	if  not pscript:
 		return false
+	
+	var file = File.new()
+	file.open(pscript.resource_path, File.READ)
+	var source_code = file.get_as_text()
+	file.close()
+	
 	var cscript:GDScript = GDScript.new()
-	cscript.set_source_code(pscript.get_source_code())
+	cscript.set_source_code(source_code)
 	if  cscript.reload(false) != OK:
 		return false
 	return true
