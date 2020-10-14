@@ -137,3 +137,16 @@ func handles(object):
 	if  object is btree:
 		return true
 	return false
+
+var try = 0
+func _process(delta):
+	var interface = get_editor_interface()
+	if  interface.is_playing_scene():
+		if  dock:
+			var debug = dock.get_node("rtree/client_debugger")
+			if  not debug.is_debug():
+				try -= 1
+				if  try <= 0:
+					try = 60
+					debug.ensure_connection()
+	return

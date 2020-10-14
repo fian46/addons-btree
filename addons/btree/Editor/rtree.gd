@@ -220,7 +220,6 @@ func update_start_debug_btn():
 		stop_debug()
 	return
 
-
 func error():
 	$layout/split/rtree.clear()
 	stop_debug()

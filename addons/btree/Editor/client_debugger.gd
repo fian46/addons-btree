@@ -3,6 +3,9 @@ extends Node
 
 var client:WebSocketClient = WebSocketClient.new()
 
+func is_debug():
+	return client.get_connection_status() == 2
+
 func ensure_connection():
 	if  client:
 		if client.get_connection_status() == 0:
