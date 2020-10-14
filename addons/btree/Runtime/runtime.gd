@@ -299,6 +299,46 @@ class Inverter extends DecoratorTNode:
 				succeed()
 		return status
 
+class RandomRepeat extends DecoratorTNode:
+	var tick_count = 0
+	var count = 0
+	var ranges = 0
+	
+	func setup(data: Dictionary, target):
+		.setup(data, target)
+		count = data.count
+		tick_count = count
+		ranges = int(data.ranges)
+		return
+	
+	func reset():
+		.reset()
+		tick_count = count + round(randi() % int(ranges))
+		return
+	
+	func tick() -> int:
+		ticked = true
+		if  count > 0 and tick_count == 0 and ranges == 0:
+			return succeed()
+		if  status != Status.RUNNING:
+			return status
+		if  not child:
+			return succeed()
+		if  child.status == Status.SUCCEED:
+			child.reset()
+		var result = child.tick()
+		if  result == Status.SUCCEED:
+			if  count > 0:
+				tick_count -= 1
+				if  tick_count == 0:
+					succeed()
+			return status
+		
+		if  result == Status.FAILED:
+			return failed()
+		return status
+
+
 class Repeat extends DecoratorTNode:
 	var tick_count = 0
 	var count = 0
@@ -401,6 +441,35 @@ class WaitNode extends TNode:
 			succeed()
 		return status
 
+class RandomWaitNode extends TNode:
+	var tick_count = 0
+	var count = 0
+	var ranges = 0
+	
+	func setup(data: Dictionary, target):
+		.setup(data, target)
+		count = data.count
+		tick_count = count
+		ranges = data.ranges
+		return
+	
+	func reset():
+		.reset()
+		tick_count = count + round(randi() % int(ranges))
+		return
+	
+	func tick() -> int:
+		ticked = true
+		if  tick_count <= 0:
+			return succeed()
+		if  status != Status.RUNNING:
+			return status
+		tick_count -= Engine.time_scale
+		if  tick_count <= 0:
+			succeed()
+		return status
+
+
 enum TNodeTypes {
 	ROOT,
 	TASK,
@@ -417,6 +486,8 @@ enum TNodeTypes {
 	RANDOM_SELECTOR,
 	RANDOM_SEQUENCE,
 	INVERTER,
+	RANDOM_REPEAT,
+	RANDOM_WAIT,
 	MINIM = 99
 }
 
@@ -439,6 +510,8 @@ static func get_constructors() -> Dictionary:
 	constructors[TNodeTypes.RANDOM_SELECTOR] = RandomSelector
 	constructors[TNodeTypes.RANDOM_SEQUENCE] = RandomSequence
 	constructors[TNodeTypes.INVERTER] = Inverter
+	constructors[TNodeTypes.RANDOM_REPEAT] = RandomRepeat
+	constructors[TNodeTypes.RANDOM_WAIT] = RandomWaitNode
 	return constructors
 
 static func create_runtime(data: Dictionary, target) -> TNode:
