@@ -107,12 +107,14 @@ caret_blink_speed = 0.5
 margin_left = 300.0
 margin_right = 320.0
 margin_bottom = 24.0
+hint_tooltip = "ctrl + shift + LEFT"
 text = "<"
 
 [node name="next" type="Button" parent="footer/search"]
 margin_left = 324.0
 margin_right = 344.0
 margin_bottom = 24.0
+hint_tooltip = "ctrl + shift + RIGHT"
 text = ">"
 [connection signal="pressed" from="group/save" to="graph" method="_on_save_pressed"]
 [connection signal="pressed" from="group/debug" to="graph" method="_on_debug_pressed"]

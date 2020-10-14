@@ -471,6 +471,12 @@ func gui_input(event):
 			jump_to_sourcecode()
 			hint("Jump To Sourcecode")
 			accept_event()
+		if  event.scancode == KEY_LEFT and not event.pressed and event.control and event.shift:
+			hint("Prev search")
+			accept_event()
+		if  event.scancode == KEY_RIGHT and not event.pressed and event.control and event.shift:
+			hint("Next search")
+			accept_event()
 		return
 
 	if  event is InputEventMouseButton:
@@ -904,7 +910,9 @@ func comp_pairs(text):
 			var itoken = i.name
 			if  i is general_fcall_class or i is minim_class:
 				itoken = i.search_token()
-			tpairs.append([itoken.similarity(text), i])
+			var similarity = itoken.similarity(text)
+			if  similarity > 0.2:
+				tpairs.append([itoken.similarity(text), i])
 	tpairs.sort_custom(self, "sort_tp")
 	return tpairs
 
