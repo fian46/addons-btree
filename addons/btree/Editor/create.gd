@@ -15,6 +15,8 @@ var general_fcall_scene = preload("res://addons/btree/Editor/general_fcall/gener
 var general_decorator_scene = preload("res://addons/btree/Editor/general_decorator/general_decorator.tscn")
 var inverter = preload("res://addons/btree/Editor/inverter/inverter.tscn")
 var general_decorator_script = preload("res://addons/btree/Editor/general_decorator/general_decorator.gd")
+var random_repeat_scene = preload("res://addons/btree/Editor/repeat/random_repeat.tscn")
+var random_wait_scene = preload("res://addons/btree/Editor/wait_node/random_wait_node.tscn")
 var pop_pos = Vector2.ZERO
 export(NodePath) var graph_path:NodePath
 export(NodePath) var hint_path:NodePath
@@ -102,6 +104,10 @@ func create_node(id):
 			inst.as_random_sequence()
 		Runtime.TNodeTypes.INVERTER:
 			inst = inverter.instance()
+		Runtime.TNodeTypes.RANDOM_REPEAT:
+			inst = random_repeat_scene.instance()
+		Runtime.TNodeTypes.RANDOM_WAIT:
+			inst = random_wait_scene.instance()
 	return inst
 
 func _ready():
@@ -122,4 +128,6 @@ func _ready():
 	pop.add_item("Random Selector", Runtime.TNodeTypes.RANDOM_SELECTOR)
 	pop.add_item("Random Sequence", Runtime.TNodeTypes.RANDOM_SEQUENCE)
 	pop.add_item("Inverter", Runtime.TNodeTypes.INVERTER)
+	pop.add_item("Random Repeat", Runtime.TNodeTypes.RANDOM_REPEAT)
+	pop.add_item("Random Wait", Runtime.TNodeTypes.RANDOM_WAIT)
 	return

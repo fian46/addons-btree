@@ -1,0 +1,70 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://addons/btree/Editor/repeat/random_repeat.gd" type="Script" id=1]
+[ext_resource path="res://addons/btree/Editor/repeat/count.gd" type="Script" id=2]
+
+[node name="random_repeat" type="GraphNode"]
+margin_left = 0.630249
+margin_top = -0.630249
+margin_right = 159.63
+margin_bottom = 52.3698
+hint_tooltip = "if count == 0 repeat until child failed, if count > 0 repeat child for x tick then succeed"
+title = "random_repeat"
+show_close = true
+resizable = true
+slot/0/left_enabled = true
+slot/0/left_type = 0
+slot/0/left_color = Color( 0, 0.133333, 1, 1 )
+slot/0/right_enabled = true
+slot/0/right_type = 0
+slot/0/right_color = Color( 0, 0.0862745, 1, 1 )
+slot/1/left_enabled = false
+slot/1/left_type = 0
+slot/1/left_color = Color( 1, 1, 1, 1 )
+slot/1/right_enabled = false
+slot/1/right_type = 0
+slot/1/right_color = Color( 1, 1, 1, 1 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="slot0" type="HBoxContainer" parent="."]
+margin_left = 16.0
+margin_top = 24.0
+margin_right = 144.0
+margin_bottom = 48.0
+
+[node name="Label" type="Label" parent="slot0"]
+margin_top = 5.0
+margin_right = 49.0
+margin_bottom = 19.0
+text = "Count : "
+
+[node name="count" type="SpinBox" parent="slot0"]
+margin_left = 53.0
+margin_right = 128.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+allow_greater = true
+script = ExtResource( 2 )
+
+[node name="slot1" type="HBoxContainer" parent="."]
+margin_left = 16.0
+margin_top = 49.0
+margin_right = 144.0
+margin_bottom = 73.0
+
+[node name="Label" type="Label" parent="slot1"]
+margin_top = 5.0
+margin_right = 50.0
+margin_bottom = 19.0
+text = "Range : "
+
+[node name="count" type="SpinBox" parent="slot1"]
+margin_left = 54.0
+margin_right = 128.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+allow_greater = true
+script = ExtResource( 2 )

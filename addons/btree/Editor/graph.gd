@@ -93,7 +93,8 @@ var general_decorator_script = preload("res://addons/btree/Editor/general_decora
 var general_fcall_class = preload("res://addons/btree/Editor/general_fcall/general_fcall.gd")
 var minim_scene = preload("res://addons/btree/Editor/minim_node/minim_node.tscn")
 var inverter_scene = preload("res://addons/btree/Editor/inverter/inverter.tscn")
-
+var random_repeat_scene = preload("res://addons/btree/Editor/repeat/random_repeat.tscn")
+var random_wait_scene = preload("res://addons/btree/Editor/wait_node/random_wait_node.tscn")
 const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
 
 func build_tree_from_data():
@@ -175,6 +176,14 @@ func create_node(n):
 		node.set_data(n.data)
 	elif  n.type == Runtime.TNodeTypes.MINIM:
 		node = minim_scene.instance()
+		node.name = n.name
+		node.set_data(n.data)
+	elif n.type == Runtime.TNodeTypes.RANDOM_REPEAT:
+		node = random_repeat_scene.instance()
+		node.name = n.name
+		node.set_data(n.data)
+	elif n.type == Runtime.TNodeTypes.RANDOM_WAIT:
+		node = random_wait_scene.instance()
 		node.name = n.name
 		node.set_data(n.data)
 	(node as GraphNode).connect("dragged", self, "node_dragged", [node])
