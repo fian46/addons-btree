@@ -473,9 +473,11 @@ func gui_input(event):
 			accept_event()
 		if  event.scancode == KEY_LEFT and not event.pressed and event.control and event.shift:
 			hint("Prev search")
+			_on_prev_pressed()
 			accept_event()
 		if  event.scancode == KEY_RIGHT and not event.pressed and event.control and event.shift:
 			hint("Next search")
+			_on_next_pressed()
 			accept_event()
 		return
 
