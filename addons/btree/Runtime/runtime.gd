@@ -135,6 +135,7 @@ class PCondition extends DecoratorTNode:
 	var target:FuncRef
 	var params := []
 	var fn:String
+	var is_init = false
 	
 	func _init():
 		status = Status.FAILED
@@ -154,6 +155,7 @@ class PCondition extends DecoratorTNode:
 		return
 	
 	func tick() -> int:
+		is_init = not ticked
 		ticked = true
 		if  not child:
 			return failed()
@@ -161,6 +163,9 @@ class PCondition extends DecoratorTNode:
 			return failed()
 		target.call_func(self)
 		return status
+	
+	func is_init():
+		return is_init
 	
 	func get_param(idx):
 		if  params.empty():
@@ -187,6 +192,7 @@ class Task extends TNode:
 	var target: FuncRef
 	var params := []
 	var fn:String
+	var is_init = false
 	
 	func setup(data: Dictionary, target):
 		.setup(data, target)
@@ -197,6 +203,7 @@ class Task extends TNode:
 		return
 	
 	func tick() -> int:
+		is_init = not ticked
 		ticked = true
 		if  status != Status.RUNNING:
 			return status
@@ -204,6 +211,9 @@ class Task extends TNode:
 			return failed()
 		target.call_func(self)
 		return status
+	
+	func is_init():
+		return is_init
 	
 	func get_param(idx):
 		if  params.empty():
@@ -382,6 +392,7 @@ class WhileNode extends DecoratorTNode:
 	var target: FuncRef
 	var params := []
 	var fn:String
+	var is_init = false
 	
 	func setup(data: Dictionary, target):
 		.setup(data, target)
@@ -392,6 +403,7 @@ class WhileNode extends DecoratorTNode:
 		return
 	
 	func tick() -> int:
+		is_init = not ticked
 		ticked = true
 		if  status != Status.RUNNING:
 			return status
@@ -404,6 +416,9 @@ class WhileNode extends DecoratorTNode:
 		if  status == Status.SUCCEED:
 			status = child.tick()
 		return status
+	
+	func is_init():
+		return is_init
 	
 	func get_param(idx):
 		if  params.empty():

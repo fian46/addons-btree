@@ -30,7 +30,6 @@ func _enter_tree():
 	return
 
 func create_runtime():
-	print("BT runtime created")
 	rtree = Runtime.create_runtime(tree.get('root', {}), get_parent())
 	return
 

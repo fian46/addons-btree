@@ -26,6 +26,13 @@ func _ready():
 	print("BT debug server init")
 	return
 
+func _exit_tree():
+	if  server && connected_id != -1:
+		server.get_peer(connected_id).close(0, "")
+		for i in range(120):
+			server.poll()
+	return
+
 func client_data(id):
 	var msg = server.get_peer(id).get_var(true)
 	if  msg.type == 0:
