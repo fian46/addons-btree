@@ -5,6 +5,7 @@ const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
 export(Dictionary) var tree = {}
 export(bool) var enable = true
 export(int, '_process', '_physics_process') var run_on = 0
+export(int, "resume", "restart") var on_enable = 0
 export(String) var _tree_id = ""
 var rtree: Runtime.TNode = null
 var swap_tree
@@ -47,9 +48,15 @@ func _physics_process(delta):
 		btree_process(delta)
 	return
 
+var was_disable = false
 func btree_process(_delta):
 	if  not enable or not rtree:
+		was_disable = true
 		return
+	if  was_disable:
+		if  on_enable == 1:
+			rtree.reset()
+		was_disable = false
 	tick()
 	return
 
