@@ -201,7 +201,6 @@ func snapc_vec(size):
 	return size
 
 func resize_request(nsize:Vector2, node:GraphNode):
-	print(node.name)
 	var size = snapc_vec(nsize)
 	var snap = snapc_vec(node.rect_size)
 	var fit = true
@@ -620,7 +619,6 @@ func do_minim(node_name, minim_name):
 	var m_inst = minim_scene.instance()
 	m_inst.connect("dragged", self, "node_dragged", [m_inst])
 	m_inst.connect("resize_request", self, "resize_request", [m_inst])
-	m_inst.connect()
 	m_inst.offset = soffset
 	m_inst.name = minim_name
 	add_child(m_inst)
