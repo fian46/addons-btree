@@ -867,6 +867,8 @@ func rec_populate(root, nodes:Array):
 
 func node_selected(node):
 	selected = node
+	name_text = selected.title
+	get_parent().get_node('footer/name/name_bar').text = name_text
 	return
 
 func focus_selected():
@@ -879,6 +881,7 @@ func focus_selected():
 
 var tindex = 0
 var search_text = ""
+var name_text = ""
 
 func _on_search_bar_text_changed(new_text):
 	tindex = 0
@@ -887,6 +890,14 @@ func _on_search_bar_text_changed(new_text):
 	if  not tpairs.empty():
 		var si = tpairs[tindex][1]
 		scroll_offset = si.offset * zoom - ((rect_size / 2) - (si.rect_size / 2))
+	return
+
+func _on_change_name_pressed():
+	if selected is Node:
+		selected.title = name_text
+		selected.name = name_text
+func _on_name_bar_text_changed(new_text):
+	name_text = new_text
 	return
 
 func _on_next_pressed():
