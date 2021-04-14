@@ -51,3 +51,19 @@ func get(key: String):
 
 func has(key: String) -> bool:
 	return data.has(key)
+
+func unset(key: String) -> bool:
+	data.erase(key)
+
+# Alias functions
+func add(key: String, value):
+	set(key, value)
+
+func clear(key: String) -> bool:
+	return unset(key)
+
+func remove(key: String) -> bool:
+	return unset(key)
+
+func delete(key: String) -> bool:
+	return unset(key)
