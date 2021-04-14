@@ -30,10 +30,11 @@ func _ready():
 
 
 # Will return false if it's overwritting an existing value
-func set(key: String, value) -> bool:
+func _set(key: String, value) -> bool:
 	var return_val = !has(key)
 	data[key] = value
 	return return_val
+
 
 
 func get(key: String):
@@ -57,7 +58,7 @@ func unset(key: String) -> bool:
 
 # Alias functions
 func add(key: String, value):
-	set(key, value)
+	_set(key, value)
 
 func clear(key: String) -> bool:
 	return unset(key)
