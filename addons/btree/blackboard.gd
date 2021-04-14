@@ -29,11 +29,14 @@ func _ready():
 		assert(key is String)
 
 
-func set_data(key: String, value):
+# Will return false if it's overwritting an existing value
+func set(key: String, value) -> bool:
+	var return_val = !has(key)
 	data[key] = value
+	return return_val
 
 
-func get_data(key: String):
+func get(key: String):
 	if data.has(key):
 		var value = data[key]
 		if value is NodePath:
@@ -46,5 +49,5 @@ func get_data(key: String):
 			return value
 
 
-func has_data(key: String) -> bool:
+func has(key: String) -> bool:
 	return data.has(key)
