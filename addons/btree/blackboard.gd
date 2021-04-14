@@ -54,7 +54,9 @@ func has(key: String) -> bool:
 	return data.has(key)
 
 func unset(key: String) -> bool:
+	var val = data.has(key)
 	data.erase(key)
+	return val
 
 # Alias functions
 func add(key: String, value):
