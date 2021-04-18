@@ -7,6 +7,7 @@ export(bool) var enable = true
 export(int, '_process', '_physics_process') var run_on = 0
 export(int, "resume", "restart") var on_enable = 0
 export(String) var _tree_id = ""
+export(NodePath) var _blackboard
 var rtree: Runtime.TNode = null
 var swap_tree
 
@@ -31,7 +32,8 @@ func _enter_tree():
 	return
 
 func create_runtime():
-	rtree = Runtime.create_runtime(tree.get('root', {}), get_parent())
+	var blackboard: Blackboard = get_node(_blackboard)
+	rtree = Runtime.create_runtime(tree.get('root', {}), get_parent(), blackboard)
 	return
 
 func swap_runtime(new_tree):

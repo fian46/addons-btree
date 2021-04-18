@@ -7,6 +7,7 @@ enum Status {
 }
 
 class TNode:
+	var blackboard: Node
 	var name:String
 	var status: int = Status.RUNNING
 	var ticked := false
@@ -531,20 +532,21 @@ static func get_constructors() -> Dictionary:
 	constructors[TNodeTypes.RANDOM_WAIT] = RandomWaitNode
 	return constructors
 
-static func create_runtime(data: Dictionary, target) -> TNode:
+static func create_runtime(data: Dictionary, target, blackboard) -> TNode:
 	if  data.empty():
 		return null
 
 	if  data.type == TNodeTypes.MINIM:
-		return create_runtime(data.data.data.root, target)
+		return create_runtime(data.data.data.root, target, blackboard)
 
 	var tnode_type = get_constructors().get(data.type)
 	var current: TNode = tnode_type.new()
 	current.name = data.name
+	current.blackboard = blackboard
 	current.setup(data.data, target)
 
 	for child in data.child:
-		var tnode_child = create_runtime(child, target)
+		var tnode_child = create_runtime(child, target, blackboard)
 		if  current is CompositeTNode:
 			current.children.append(tnode_child)
 		elif current is DecoratorTNode:
