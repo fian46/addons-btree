@@ -1111,7 +1111,6 @@ func _on_change_name_pressed():
 func change_node_name(new_name, name_line_edit):	
 	if selected:
 		selected.title = new_name
-		selected.name = new_name
 		name_line_edit.text = new_name
 	else:
 		name_line_edit.text = ""
@@ -1121,12 +1120,11 @@ func undo_change_node_name(old_name, name_line_edit):
 	if selected:
 		name_line_edit.text = old_name
 		selected.title = old_name
-		selected.name = old_name
 	else:
 		name_line_edit.text = ""
 
 func node_selected_handle_footer():
-	name_text = selected.name
+	name_text = selected.title
 	var name_bar = get_parent().get_node('footer/name/name_bar')
 	name_bar.text = name_text
 	if(selected.name == "root"):
