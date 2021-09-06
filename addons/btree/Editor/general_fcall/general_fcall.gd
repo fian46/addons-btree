@@ -1,5 +1,5 @@
 tool
-extends GraphNode
+extends BehaviorTreeNode
 
 const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
 var type = Runtime.TNodeTypes.TASK
@@ -7,8 +7,7 @@ var load_function = ""
 var params = []
 var param_scene = preload("res://addons/btree/Editor/task/param.tscn")
 
-func _ready():
-	connect("close_request", self, "self_close")
+func _ready():	
 	$Input/Add.connect("pressed", self, "add_pressed")
 	return
 
@@ -20,7 +19,6 @@ func search_token():
 	return str(name, " | ", fname)
 
 func _enter_tree():
-	title = name
 	update()
 	var opt = $Main/Required/opt_function
 	for i in range(opt.get_item_count()):
@@ -39,17 +37,20 @@ func _enter_tree():
 
 func as_task():
 	name = "task"
+	title = name
 	type = Runtime.TNodeTypes.TASK
 	return
 
 func as_priority_condition():
 	name = "priority_condition"
+	title = name
 	type = Runtime.TNodeTypes.PRIORITY_CONDITION
 	set_slot(0, true, 1, Color.yellow, true, 0, Color.blue)
 	return
 
 func as_while():
 	name = "while_node"
+	title = name
 	type = Runtime.TNodeTypes.WHILE
 	set_slot(0, true, 0, Color.blue, true, 0, Color.blue)
 	return
@@ -99,8 +100,7 @@ func self_close():
 	return
 
 func set_data(data):
-	offset = data.offset
-	rect_size = data.size
+	.set_data(data)
 	load_function = data.fn
 	if  data.has("params"):
 		params = data.params
@@ -109,6 +109,7 @@ func set_data(data):
 	return
 
 func get_data():
+	var ret_data = .get_data()
 	var opt = $Main/Required/opt_function
 	var sel = $Main/Required/opt_function.selected
 	var fname = null
@@ -122,13 +123,12 @@ func get_data():
 		var val = pr.get_child(i).get_value()
 		ret_param.append(val)
 		values.append(val[0])
-	var ret_data = {
-		"offset":offset,
-		"size":rect_size,
-		"fn":fname,
-		"params":ret_param,
-		"values":values
-	}
+	
+	#add node specific data
+	ret_data.fn = fname
+	ret_data.params = ret_param
+	ret_data.values = values
+	
 	return ret_data
 
 func add_pressed():
