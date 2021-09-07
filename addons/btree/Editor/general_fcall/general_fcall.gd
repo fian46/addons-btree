@@ -30,7 +30,7 @@ func _enter_tree():
 	for i in params:
 		var input = param_scene.instance()
 		input.connect("remove_me", self, "remove_param")
-		input.set_value(i);
+		input.set_value(i)
 		$Params.add_child(input)
 		input.update_label()
 	return
