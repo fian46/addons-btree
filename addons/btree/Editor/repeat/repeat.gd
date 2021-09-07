@@ -5,8 +5,7 @@ const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
 
 const type = Runtime.TNodeTypes.REPEAT
 
-func _ready():	
-	$slot0/count.value = 0
+func _ready():
 	return
 
 func get_data():
@@ -16,5 +15,5 @@ func get_data():
 
 func set_data(data):
 	.set_data(data)
-	$slot0/count.call_deferred("set_value", data.count)
+	$slot0/count.value = data.count
 	return
