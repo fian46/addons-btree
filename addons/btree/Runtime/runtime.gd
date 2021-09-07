@@ -8,6 +8,7 @@ enum Status {
 
 class TNode:
 	var name:String
+	var title:String
 	var status: int = Status.RUNNING
 	var ticked := false
 	
@@ -541,9 +542,14 @@ static func create_runtime(data: Dictionary, target) -> TNode:
 	var tnode_type = get_constructors().get(data.type)
 	var current: TNode = tnode_type.new()
 	current.name = data.name
+	if data.has("data") && data.data.has("title"):
+		current.title = data.data.title
+	else:
+		current.title = data.name
+	
 	current.setup(data.data, target)
 
-	for child in data.child:
+	for child in data.child:		
 		var tnode_child = create_runtime(child, target)
 		if  current is CompositeTNode:
 			current.children.append(tnode_child)
