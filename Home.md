@@ -54,3 +54,21 @@ Then activate the plugin in your Project Settings.
 * The tutorial is credited to this Youtube channel  [Vic Ben](https://www.youtube.com/channel/UCKfmrrk5hcgKiPHKN6mi4HA)
 * This is a great tutorial on how to use the plugins [Video Link](https://youtu.be/HEnKCJ9AQ9E)
 * Again I have to thank Vic Ben for making these tutorial videos.
+
+
+### Updates
+This is here to keep track of changes from https://github.com/fian46/addons-btree
+* 9/7/2021
+	* Refactored many editor nodes to inherit from a single class to make it easier to modify more general things.
+	* Added ability to rename nodes with undo-redo functionality
+	* Fixed issue with changing tabs and BTree not saving
+	* Modified some nodes to stop using call_deferred since it was causing loading after editor was closed and reopened to not populate fields
+
+### Planned
+* Generalize wait and random_wait to inherit from a common class.
+* Generalize repeat and random_repeat to inherit from a common class.
+* A way to have "branches" of trees that can be added to a tree. When added it would run everything inside inner tree. Making it easier to organize and share behaviors.
+
+### Other
+* Feel free to contribute if you would like! 
+* I will probably be adding features as I need them for my own game.
