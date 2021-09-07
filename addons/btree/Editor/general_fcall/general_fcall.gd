@@ -30,7 +30,7 @@ func _enter_tree():
 	for i in params:
 		var input = param_scene.instance()
 		input.connect("remove_me", self, "remove_param")
-		input.call_deferred("set_value", i)
+		input.set_value(i);
 		$Params.add_child(input)
 		input.update_label()
 	return
@@ -122,6 +122,7 @@ func get_data():
 	
 	#add node specific data
 	ret_data.fn = fname
+	print(ret_param)
 	ret_data.params = ret_param
 	ret_data.values = values
 	
