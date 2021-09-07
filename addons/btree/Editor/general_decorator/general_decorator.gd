@@ -10,9 +10,6 @@ func _ready():
 	$slot0/Del.connect("pressed", self, "del_pressed")	
 	return
 
-func _enter_tree():	
-	return
-
 func as_sequence():
 	type = Runtime.TNodeTypes.SEQUENCE
 	name = "sequence"

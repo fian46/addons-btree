@@ -4,7 +4,6 @@ extends BehaviorTreeNode
 const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
 const type = Runtime.TNodeTypes.WAIT
 
-
 func get_data():
 	var ret_data = .get_data()
 	ret_data.count = $slot0/count.value

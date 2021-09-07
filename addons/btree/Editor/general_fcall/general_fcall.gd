@@ -95,10 +95,6 @@ func update():
 			opt.selected = old_sel
 	return
 
-func self_close():
-	get_parent().child_delete(self)
-	return
-
 func set_data(data):
 	.set_data(data)
 	load_function = data.fn

@@ -2,7 +2,6 @@ tool
 extends BehaviorTreeNode
 
 const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
-
 const type = Runtime.TNodeTypes.PRIORITY_SELECTOR
 
 func _on_Add_pressed():
@@ -19,10 +18,6 @@ func _on_Del_pressed():
 	get_parent().ps_del_slot(name)
 	return
 
-func get_data():
-	return .get_data();
-
-
 func set_data(data):
 	.set_data(data);
 	
@@ -30,4 +25,3 @@ func set_data(data):
 		add_child(label())
 		set_slot(get_child_count() - 1, false, 0, Color.blue, true, 1, Color.yellow, null, null)
 	return
-

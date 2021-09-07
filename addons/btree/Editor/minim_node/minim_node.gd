@@ -2,7 +2,6 @@ tool
 extends BehaviorTreeNode
 
 const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
-
 const type = Runtime.TNodeTypes.MINIM
 var data
 
@@ -12,7 +11,6 @@ func _ready():
 
 func search_token():
 	return $slot0/label.text
-
 
 func get_data():
 	var ret_data = .get_data();
