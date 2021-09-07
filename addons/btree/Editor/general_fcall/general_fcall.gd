@@ -122,7 +122,6 @@ func get_data():
 	
 	#add node specific data
 	ret_data.fn = fname
-	print(ret_param)
 	ret_data.params = ret_param
 	ret_data.values = values
 	
