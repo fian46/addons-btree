@@ -3,6 +3,8 @@ extends EditorPlugin
 
 var btree = load("res://addons/btree/script/btree.gd")
 var ibtree = load("res://addons/btree/icons/icon_tree.svg")
+var blackboard = load("res://addons/btree/blackboard.gd")
+var iblackboard = load("res://addons/btree/icons/icon_blackboard.svg")
 var topi = load("res://addons/btree/icons/icon_tree_top.svg")
 var dock_scene = preload("res://addons/btree/Editor/test.tscn")
 var dock
@@ -81,6 +83,7 @@ func _enter_tree():
 	dock = dock_scene.instance()
 	dock.halt("Please select a BTREE node")
 	add_custom_type("BTREE", "Node", btree, ibtree)
+	add_custom_type("Blackboard", "Node", blackboard, iblackboard)
 	get_editor_interface().get_editor_viewport().add_child(dock)
 	get_editor_interface().get_selection().connect("selection_changed",self,"selection_changed");
 	var ps = ProjectSettings
