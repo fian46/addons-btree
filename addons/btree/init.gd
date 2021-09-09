@@ -11,8 +11,12 @@ func selection_changed():
 	if  not dock:
 		return
 	var tree_editor = dock.get_node("editor/graph")
-	tree_editor.clear_editor()
+	
 	var selection = get_editor_interface().get_selection().get_selected_nodes()
+	var graph = dock.get_node("editor/graph")
+	if graph:
+		graph._on_save_pressed()
+	tree_editor.clear_editor()
 	if  not selection:
 		tree_editor.clear_data()
 		dock.halt("Please select a BTREE node")
