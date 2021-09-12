@@ -277,6 +277,9 @@ func remove_node(node_name, cp):
 		disconnect_node(i[0], i[1], i[2], i[3])
 	var node = get_node_or_null(node_name)
 	if node:
+		if node == selected:
+			var name_bar = get_parent().get_node('footer/name/name_bar')
+			name_bar.text = ""
 		node.queue_free()
 	else:
 		print("NOT FOUND : ",node_name)
@@ -867,6 +870,7 @@ func rec_populate(root, nodes:Array):
 
 func node_selected(node):
 	selected = node
+	node_selected_handle_footer()
 	return
 
 func focus_selected():
@@ -1087,3 +1091,52 @@ func ins_index(name, index, value):
 		params.append(i.get_value())
 	params.insert(index, value)
 	return
+
+var name_text = ""
+
+func submit_name_change():
+	if selected is GraphNode and selected.name != "root":
+		var name_bar = get_parent().get_node('footer/name/name_bar')
+		name_bar.release_focus()
+		var new_name = name_text
+		var old_name = selected.title
+		undo_redo.create_action("change node name")
+		undo_redo.add_do_method(self, "change_node_name", new_name, name_bar)
+		undo_redo.add_undo_method(self, "undo_change_node_name", old_name, name_bar)
+		undo_redo.commit_action()
+
+func _on_change_name_pressed():
+	submit_name_change()
+
+func change_node_name(new_name, name_line_edit):	
+	if selected:
+		selected.title = new_name
+		name_line_edit.text = new_name
+	else:
+		name_line_edit.text = ""
+	
+
+func undo_change_node_name(old_name, name_line_edit):
+	if selected:
+		name_line_edit.text = old_name
+		selected.title = old_name
+	else:
+		name_line_edit.text = ""
+
+func node_selected_handle_footer():
+	name_text = selected.title
+	var name_bar = get_parent().get_node('footer/name/name_bar')
+	name_bar.text = name_text
+	if(selected.name == "root"):
+		name_bar.editable = false
+	else:
+		name_bar.editable = true
+
+
+func _on_name_bar_text_changed(new_text):
+	name_text = new_text
+
+
+
+func _on_name_bar_text_entered(new_text):
+	submit_name_change()

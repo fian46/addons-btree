@@ -133,7 +133,7 @@ func walk(nd:rt.TNode, offset:Dictionary):
 	if  nd == null:
 		return null
 	var node = {}
-	node.name = nd.name
+	node.name = nd.get("title")
 	node.offset = offset[nd.name]
 	if  nd.get("fn"):
 		node.fn = nd.get("fn")
