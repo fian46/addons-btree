@@ -1,13 +1,13 @@
-tool
+@tool
 extends GraphEdit
 
 var data = null
 var root_object = null
 var control = null
 var active = false
-var undo_redo:UndoRedo
+var undo_redo:EditorUndoRedoManager #ivo
 var editor_interface:EditorInterface
-export(NodePath) var hint_path:NodePath
+@export var hint_path: NodePath
 
 func _ready():
 	set_process_input(true)
@@ -50,8 +50,7 @@ func valid_script():
 	if  not pscript:
 		return false
 	
-	var file = File.new()
-	file.open(pscript.resource_path, File.READ)
+	var file = FileAccess.open(pscript.resource_path, FileAccess.READ) #ivo 4.1.1
 	var source_code = file.get_as_text()
 	file.close()
 	
@@ -75,7 +74,7 @@ func load_data(ndata, ncontrol):
 
 func clear_editor():
 	for i in get_connection_list():
-		disconnect_node(i.from, i.from_port, i.to, i.to_port)
+		disconnect_node(i.from_node, i.from_port, i.to_node, i.to_port) #ivo 4.2
 	for i in get_children():
 		if  i is GraphNode and i.name != "root":
 			var a = 0
@@ -89,8 +88,8 @@ var repeat_scene = preload("res://addons/btree/Editor/repeat/repeat.tscn")
 var wait_scene = preload("res://addons/btree/Editor/wait_node/wait_node.tscn")
 var general_fcall_scene = preload("res://addons/btree/Editor/general_fcall/general_fcall.tscn")
 var general_decorator_scene = preload("res://addons/btree/Editor/general_decorator/general_decorator.tscn")
-var general_decorator_script = preload("res://addons/btree/Editor/general_decorator/general_decorator.gd")
-var general_fcall_class = preload("res://addons/btree/Editor/general_fcall/general_fcall.gd")
+const general_decorator_script = preload("res://addons/btree/Editor/general_decorator/general_decorator.gd") #ivo 4.1.1
+const general_fcall_class = preload("res://addons/btree/Editor/general_fcall/general_fcall.gd") # ivo 4.1.1
 var minim_scene = preload("res://addons/btree/Editor/minim_node/minim_node.tscn")
 var inverter_scene = preload("res://addons/btree/Editor/inverter/inverter.tscn")
 var random_repeat_scene = preload("res://addons/btree/Editor/repeat/random_repeat.tscn")
@@ -110,121 +109,124 @@ func build_tree_from_data():
 func create_node(n):
 	var node
 	if  n.type == Runtime.TNodeTypes.TASK:
-		node = general_fcall_scene.instance()
+		node = general_fcall_scene.instantiate()
 		node.as_task()
 		node.name = n.name
 		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.SEQUENCE:
-		node = general_decorator_scene.instance()
+		node = general_decorator_scene.instantiate()
 		node.as_sequence()
 		node.name = n.name
 		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.SELECTOR:
-		node = general_decorator_scene.instance()
+		node = general_decorator_scene.instantiate()
 		node.as_selector()
 		node.name = n.name
 		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.PRIORITY_SELECTOR:
-		node = pselector_scene.instance()
+		node = pselector_scene.instantiate()
 		node.name = n.name
 		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.PRIORITY_CONDITION:
-		node = general_fcall_scene.instance()
+		node = general_fcall_scene.instantiate()
 		node.as_priority_condition()
 		node.name = n.name
 		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.PARALEL:
-		node = general_decorator_scene.instance()
+		node = general_decorator_scene.instantiate()
 		node.as_paralel()
 		node.name = n.name
 		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.MUTE:
-		node = mute_scene.instance()
+		node = mute_scene.instantiate()
 		node.name = n.name
 		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.REPEAT:
-		node = repeat_scene.instance()
+		node = repeat_scene.instantiate()
 		node.name = n.name
 		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.WHILE:
-		node = general_fcall_scene.instance()
+		node = general_fcall_scene.instantiate()
 		node.as_while()
 		node.name = n.name
 		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.WAIT:
-		node = wait_scene.instance()
+		node = wait_scene.instantiate()
 		node.name = n.name
 		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.RACE:
-		node = general_decorator_scene.instance()
+		node = general_decorator_scene.instantiate()
 		node.as_race()
 		node.name = n.name
 		node.set_data(n.data)
 	elif  n.type == Runtime.TNodeTypes.RANDOM_SELECTOR:
-		node = general_decorator_scene.instance()
+		node = general_decorator_scene.instantiate()
 		node.as_random_selector()
 		node.name = n.name
 		node.set_data(n.data)
 	elif  n.type == Runtime.TNodeTypes.RANDOM_SEQUENCE:
-		node = general_decorator_scene.instance()
+		node = general_decorator_scene.instantiate()
 		node.as_random_sequence()
 		node.name = n.name
 		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.INVERTER:
-		node = inverter_scene.instance()
+		node = inverter_scene.instantiate()
 		node.name = n.name
 		node.set_data(n.data)
 	elif  n.type == Runtime.TNodeTypes.MINIM:
-		node = minim_scene.instance()
+		node = minim_scene.instantiate()
 		node.name = n.name
 		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.RANDOM_REPEAT:
-		node = random_repeat_scene.instance()
+		node = random_repeat_scene.instantiate()
 		node.name = n.name
 		node.set_data(n.data)
 	elif n.type == Runtime.TNodeTypes.RANDOM_WAIT:
-		node = random_wait_scene.instance()
+		node = random_wait_scene.instantiate()
 		node.name = n.name
 		node.set_data(n.data)
-	(node as GraphNode).connect("dragged", self, "node_dragged", [node])
-	(node as GraphNode).connect("resize_request", self, "resize_request", [node])
+	(node as GraphNode).connect("dragged", Callable(self, "node_dragged").bind(node))
+	(node as GraphNode).connect("resize_request", Callable(self, "resize_request").bind(node))
+	
+	add_grnode_close_button(node) #ivo 4.2
+	
 	if  node is general_decorator_script:
 		node.undo_redo = undo_redo
 	return node
 
 func snapc_vec(size):
-	size.x /= snap_distance
-	size.y /= snap_distance
+	size.x /= snapping_distance
+	size.y /= snapping_distance
 	size.x = ceil(size.x)
 	size.y = ceil(size.y)
-	size *= snap_distance
+	size *= snapping_distance
 	return size
 
 func resize_request(nsize:Vector2, node:GraphNode):
 	var size = snapc_vec(nsize)
-	var snap = snapc_vec(node.rect_size)
+	var snap = snapc_vec(node.size)
 	var fit = true
-	var temp = node.rect_size
-	node.rect_size = size
-	fit = node.rect_size.is_equal_approx(size)
-	node.rect_size = temp
+	var temp = node.size
+	node.size = size
+	fit = node.size.is_equal_approx(size)
+	node.size = temp
 	if  not fit:
-		node.rect_size = Vector2.ZERO
-		size = snapc_vec(node.rect_size)
-		node.rect_size = temp
+		node.size = Vector2.ZERO
+		size = snapc_vec(node.size)
+		node.size = temp
 	if  not size.is_equal_approx(snap):
 		undo_redo.create_action("node resize")
 		undo_redo.add_do_method(self, "update_node_rect_size", node.name, size)
-		undo_redo.add_undo_method(self, "update_node_rect_size", node.name, node.rect_size)
+		undo_redo.add_undo_method(self, "update_node_rect_size", node.name, node.size)
 		undo_redo.commit_action()
 	return
 
 func update_node_rect_size(node_name, size):
-	var node:GraphNode = get_node_or_null(node_name)
+	var node:GraphNode = get_node_or_null(node_name as NodePath) #ivo
 	if  node:
-		node.rect_size = size
-		if  not node.rect_size.is_equal_approx(size):
-			node.rect_size = snapc_vec(node.rect_size)
+		node.size = size
+		if  not node.size.is_equal_approx(size):
+			node.size = snapc_vec(node.size)
 	return
 
 func connection_request(from, from_slot, to, to_slot):
@@ -232,10 +234,10 @@ func connection_request(from, from_slot, to, to_slot):
 		return
 	var dc = []
 	for i in get_connection_list():
-		if  from == i.from and from_slot == i.from_port:
-			dc.append([i.from, i.from_port, i.to, i.to_port])
-		if  to == i.to and to_slot == i.to_port:
-			dc.append([i.from, i.from_port, i.to, i.to_port])
+		if  from == i.from_node and from_slot == i.from_port: #ivo 4.2
+			dc.append([i.from_node, i.from_port, i.to_node, i.to_port]) #ivo 4.2
+		if  to == i.to_node and to_slot == i.to_port: #ivo 4.2
+			dc.append([i.from_node, i.from_port, i.to_node, i.to_port]) #ivo 4.2			
 	undo_redo.create_action("connect_node")
 #	redo
 	for i in dc:
@@ -251,8 +253,8 @@ func connection_request(from, from_slot, to, to_slot):
 func child_delete(node):
 	var cp = []
 	for i in get_connection_list():
-		if  node.name == i.from or node.name == i.to:
-			cp.append([i.from, i.from_port, i.to, i.to_port])
+		if  node.name == i.from_node or node.name == i.to_node: #ivo 4.2
+			cp.append([i.from_node, i.from_port, i.to_node, i.to_port])#ivo 4.2
 	
 	var data = {}
 	data["name"] = node.name
@@ -275,11 +277,8 @@ func re_create_node(data, cp):
 func remove_node(node_name, cp):
 	for i in cp:
 		disconnect_node(i[0], i[1], i[2], i[3])
-	var node = get_node_or_null(node_name)
+	var node = get_node_or_null(node_name as NodePath) #ivo
 	if node:
-		if node == selected:
-			var name_bar = get_parent().get_node('footer/name/name_bar')
-			name_bar.text = ""
 		node.queue_free()
 	else:
 		print("NOT FOUND : ",node_name)
@@ -300,15 +299,16 @@ func _on_save_pressed():
 	data.tree = create_snapshot()
 	
 	var cn:Node = data
-	while cn != null && (cn.filename == "" || cn.filename == null):
+	while cn != null && (cn.scene_file_path == "" || cn.scene_file_path == null): #ivo
 		cn = cn.get_parent()
 	if  cn:
 		var path = cn.get_path_to(data)
-		data._tree_id = str(hash(cn.filename)) + str(hash(str(path)))
+		data._tree_id = str(hash(cn.scene_file_path)) + str(hash(str(path))) #ivo
 	
 	var client = get_parent().get_parent().get_node("rtree/client_debugger")
-	var ws:WebSocketClient = client.client as WebSocketClient
-	if  ws.get_connection_status() == 2:
+	var ws:WebSocketPeer = client.client.get_peer() as WebSocketPeer #ivo 4.1.1
+	
+	if  ws.get_ready_state() ==WebSocketPeer.STATE_OPEN: #2:
 		hint("BT hot reload")
 		var msg = {}
 		msg.type = 4
@@ -321,16 +321,16 @@ func build_tree(root, conn:Array, nodes):
 	var children = []
 	var removed = []
 	for c in conn:
-		if  c.from == root.name:
+		if  c.from_node == root.name: #ivo 4.2
 			removed.append(c)
 
 	root.child = children
-	removed.sort_custom(self, "sort_from")
+	removed.sort_custom(Callable(self, "sort_from"))
 
 	for i in removed:
-		var ch = find(i.to, nodes)
+		var ch = find(i.to_node, nodes)
 		children.append(ch)
-		conn.remove(conn.find(i))
+		conn.remove_at(conn.find(i)) #ivo 4.1.1
 
 	for i in children:
 		build_tree(i, conn, nodes)
@@ -366,7 +366,7 @@ func ps_del_slot(name):
 	var port = node.get_connection_output_count() - 1
 	var con
 	for i in get_connection_list():
-		if  i.from == name and i.from_port == port:
+		if i.from_node == name and i.from_port == port: #ivo 4.2
 			con = i
 			break
 	undo_redo.create_action("remove_slot")
@@ -378,7 +378,6 @@ func ps_del_slot(name):
 		undo_redo.add_undo_method(self, "connect_node", con.from, con.from_port, con.to, con.to_port)
 	undo_redo.commit_action()
 	return
-
 
 func gd_add_slot(name):
 	undo_redo.create_action("add_slot")
@@ -394,7 +393,7 @@ func gd_del_slot(name):
 	var port = node.get_connection_output_count() - 1
 	var con
 	for i in get_connection_list():
-		if  i.from == name and i.from_port == port:
+		if  i.from_node == name and i.from_port == port: #ivo 4.2
 			con = i
 			break
 	undo_redo.create_action("remove_slot")
@@ -408,36 +407,36 @@ func gd_del_slot(name):
 	return
 
 func add_slot1(name):
-	var node:GraphNode = get_node(name)
+	var node:GraphNode = get_node(name as NodePath) #ivo
 	node.add_child(label(name))
-	node.set_slot(node.get_child_count() - 1, false, 0, Color.blue, true, 1, Color.yellow, null, null)
+	node.set_slot(node.get_child_count() - 1, false, 0, Color.BLUE, true, 1, Color.YELLOW, null, null)
 	return
 
 func add_slot(name):
-	var node:GraphNode = get_node(name)
+	var node:GraphNode = get_node(name as NodePath) #ivo
 	node.add_child(label(name))
-	node.set_slot(node.get_child_count() - 1, false, 0, Color.blue, true, 0, Color.blue, null, null)
+	node.set_slot(node.get_child_count() - 1, false, 0, Color.BLUE, true, 0, Color.BLUE, null, null)
 	return
 
 func del_slot(name):
-	var node:GraphNode = get_node(name)
+	var node:GraphNode = get_node(name as NodePath) #ivo
 	if  get_child_count() > 1:
 		node.clear_slot(node.get_child_count() - 1)
 		node.remove_child(node.get_child(node.get_child_count() - 1))
-		node.rect_size = Vector2.ZERO
+		node.size = Vector2.ZERO
 	return
 
 func label(name):
-	var node = get_node(name)
+	var node = get_node(name as NodePath) #ivo
 	var l = Label.new()
-	l.align = Label.ALIGN_RIGHT
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT #ivo
 	l.text = str(node.get_child_count())
 	return l
 
 func slot_removed(name, slot):
 	for i in get_connection_list():
-		if  i.from == name and i.from_port == slot:
-			disconnect_node(i.from, i.from_port, i.to, i.to_port)
+		if  i.from_node == name and i.from_port == slot: #ivo 4.2
+			disconnect_node(i.from_node, i.from_port, i.to_node, i.to_port) #ivo 4.2			
 	return
 
 func gui_input(event):
@@ -445,59 +444,59 @@ func gui_input(event):
 		return
 
 	if  event is InputEventKey:
-		if  event.scancode == KEY_M and not event.pressed and event.control and event.shift:
+		if  event.keycode == KEY_M and not event.pressed and event.ctrl_pressed and event.shift_pressed:
 			minimize_node()
 			hint("Node Minimized")
 			accept_event()
 
-		if  event.scancode == KEY_C and not event.pressed and event.control and event.shift:
+		if  event.keycode == KEY_C and not event.pressed and event.ctrl_pressed and event.shift_pressed:
 			copy_node()
 			hint("Recursive Duplicate Node")
 			accept_event()
 
-		if  event.scancode == KEY_X and not event.pressed and event.control and event.shift:
+		if  event.keycode == KEY_X and not event.pressed and event.ctrl_pressed and event.shift_pressed:
 			rdelete_node()
 			hint("Recursive Delete Node")
 			accept_event()
 
-		if  event.scancode == KEY_SPACE and event.pressed and event.control and event.shift:
+		if  event.keycode == KEY_SPACE and event.pressed and event.ctrl_pressed and event.shift_pressed:
 			rmove_node()
 			hint("Recursive Move Node")
 			accept_event()
 
-		if  event.scancode == KEY_F  and not event.pressed and event.control:
+		if  event.keycode == KEY_F  and not event.pressed and event.ctrl_pressed:
 			focus_selected()
 			hint("Focus Node")
 			accept_event()
 
-		if  event.scancode == KEY_J  and not event.pressed and event.control:
+		if  event.keycode == KEY_J  and not event.pressed and event.ctrl_pressed:
 			jump_to_sourcecode()
 			hint("Jump To Sourcecode")
 			accept_event()
-		if  event.scancode == KEY_LEFT and not event.pressed and event.control and event.shift:
+		if  event.keycode == KEY_LEFT and not event.pressed and event.ctrl_pressed and event.shift_pressed:
 			hint("Prev search")
 			_on_prev_pressed()
 			accept_event()
-		if  event.scancode == KEY_RIGHT and not event.pressed and event.control and event.shift:
+		if  event.keycode == KEY_RIGHT and not event.pressed and event.ctrl_pressed and event.shift_pressed:
 			hint("Next search")
 			_on_next_pressed()
 			accept_event()
 		return
 
 	if  event is InputEventMouseButton:
-		if  event.button_index == 4 and event.control and event.shift:
+		if  event.button_index == 4 and event.ctrl_pressed and event.shift_pressed: #ivo
 			zoom += 0.1
 			accept_event()
 			hint("Zoom In")
 			return
-		if  event.button_index == 5 and event.control and event.shift:
+		if  event.button_index == 5 and event.ctrl_pressed and event.shift_pressed: #ivo
 			zoom -= 0.1
 			accept_event()
 			hint("Zoom Out")
 			return
 	return
 
-var callable = preload("res://addons/btree/Editor/general_fcall/general_fcall.gd")
+const callable = preload("res://addons/btree/Editor/general_fcall/general_fcall.gd") #ivo 4.1.1
 func jump_to_sourcecode():
 	if  selected is callable:
 		var fn:String = selected.get_data().fn
@@ -561,7 +560,7 @@ func copy_node():
 	
 	for i in nodes:
 		i.name = nmap[i.name]
-	var shifted = root_offset - selected.offset
+	var shifted = root_offset - selected.position_offset #ivo
 	undo_redo.create_action("recursive_copy")
 	undo_redo.add_do_method(self, "create_graph", nodes, con_pair, shifted)
 	undo_redo.add_undo_method(self, "delete_graph", nodes, con_pair)
@@ -581,13 +580,13 @@ func delete_graph(nodes, con_pair):
 func create_graph(nodes, con_pair, shifted):
 	for n in nodes:
 		var inst = create_node(n)
-		inst.offset += shifted
+		inst.position_offset += shifted #ivo
 		add_child(inst)
 	for c in con_pair:
 		connect_node(c[0], c[1], c[2], c[3])
 	return
 
-var minim_class = preload("res://addons/btree/Editor/minim_node/minim_node.gd")
+const minim_class = preload("res://addons/btree/Editor/minim_node/minim_node.gd") #ivo 4.1.1
 
 func minimize_node():
 	if  not selected:
@@ -602,7 +601,7 @@ func minimize_node():
 	if  selected.name == "root":
 		hint("Cannot Minimize \"root\" Node !")
 		return
-	var tnode = minim_scene.instance()
+	var tnode = minim_scene.instantiate()
 	add_child(tnode)
 	var target_name = tnode.name
 	remove_child(tnode)
@@ -613,16 +612,14 @@ func minimize_node():
 	undo_redo.commit_action()
 	return
 
-
 func do_minim(node_name, minim_name):
-	var mnode = get_node_or_null(node_name)
+	var mnode = get_node_or_null(node_name as NodePath) #ivo
 	if  not mnode:
 		return
-	var soffset = mnode.offset
-	var m_inst = minim_scene.instance()
-	m_inst.connect("dragged", self, "node_dragged", [m_inst])
-	m_inst.connect("resize_request", self, "resize_request", [m_inst])
-	m_inst.offset = soffset
+	var soffset = mnode.position_offset #ivo
+	var m_inst = minim_scene.instantiate()
+	m_inst.connect("dragged", Callable(self, "node_dragged").bind(m_inst))
+	m_inst.position_offset = soffset #ivo
 	m_inst.name = minim_name
 	add_child(m_inst)
 
@@ -644,12 +641,12 @@ func do_minim(node_name, minim_name):
 	var connection = []
 	for i in nodes:
 		for j in get_connection_list():
-			if  i.name == j.from:
+			if  i.name == j.from_node: #ivo 4.2
 				connection.append(j)
 
 	var current_connection = null
 	for i in get_connection_list():
-		if  i.to == cp.name:
+		if  i.to_node == cp.name: #ivo 4.2
 			current_connection = i
 			break
 
@@ -672,18 +669,18 @@ func do_minim(node_name, minim_name):
 	m_inst.data["root"] = mroot
 
 	for i in get_connection_list():
-		if  i.to == mnode.name:
-			disconnect_node(i.from, i.from_port, i.to, i.to_port)
+		if  i.to_node == cp.name: #ivo 4.2
+			disconnect_node(i.from_node, i.from_port, i.to_node, i.to_port) #ivo 4.2			
 
 	if  current_connection:
-		connect_node(current_connection.from, current_connection.from_port, m_inst.name, 0)
+		connect_node(current_connection.from_node, current_connection.from_port, m_inst.name, 0) #ivo 4.2
 
 	for i in m_inst.data["connection"]:
-		disconnect_node(i.from, i.from_port, i.to, i.to_port)
+		disconnect_node(i.from_node, i.from_port, i.to_node, i.to_port) #ivo 4.2
 
 	for i in m_inst.data["nodes"]:
-		if  has_node(i.name):
-			var n = get_node(i.name)
+		if  has_node(i.name as NodePath): #ivo 4.2
+			var n = get_node(i.name as NodePath) #ivo 4.2	
 			n.queue_free()
 	selected = m_inst
 	set_selected(m_inst)
@@ -697,7 +694,7 @@ func maximize_node(minim):
 	return
 
 func do_maxim(node_name):
-	var minim = get_node_or_null(node_name)
+	var minim = get_node_or_null(node_name as NodePath) #ivo
 	if  not minim:
 		return
 	
@@ -724,19 +721,19 @@ func do_maxim(node_name):
 			break
 	
 	if  rinst:
-		var shifted = minim.offset - rinst.offset
+		var shifted = minim.position_offset - rinst.position_offset
 		for i in inst_node:
-			i.offset += shifted
+			i.position_offset += shifted #ivo
 	
 	for i in nodes:
 		for j in connection:
-			if  i.name == j.from or i.name == j.to:
-				connect_node(mapping[j.from], j.from_port, mapping[j.to], j.to_port)
+			if  i.name == j.from_node or i.name == j.to_node: #ivo 4.2
+				connect_node(mapping[j.from_node], j.from_port, mapping[j.to_node], j.to_port) #ivo 4.2
 	
 	for i in get_connection_list():
-		if  i.to == minim.name:
-			disconnect_node(i.from, i.from_port, i.to, i.to_port)
-			connect_node(i.from, i.from_port, rinst.name, 0)
+		if  i.to_node == minim.name:
+			disconnect_node(i.from_node, i.from_port, i.to_node, i.to_port) #ivo 4.2			
+			connect_node(i.from_node, i.from_port, rinst.name, 0) #ivo 4.2
 	
 	minim.queue_free()
 	selected = rinst
@@ -773,13 +770,13 @@ func rdelete_node():
 	
 	for i in nodes:
 		for j in get_connection_list():
-			if  i.name == j.from or i.name == j.to:
-				dcon.append([j.from, j.from_port, j.to, j.to_port])
+			if  i.name == j.from_node or i.name == j.to_node: #ivo 4.2
+				dcon.append([j.from_node, j.from_port, j.to_node, j.to_port])	#ivo 4.2
 	
 	var dnam = []
 	for i in nodes:
-		if  has_node(i.name):
-			var node = get_node(i.name)
+		if  has_node(i.name as NodePath): #ivo 4.2
+			var node = get_node(i.name as NodePath) #ivo 4.2
 			var data = {}
 			data["name"] = node.name
 			data["type"] = node.type
@@ -806,7 +803,8 @@ func cnode(ndata:Dictionary):
 	return
 
 func fnode(ndata:Dictionary):
-	var node = get_node(ndata.name)
+	#var node = get_node(ndata.name)
+	var node = get_node(ndata.name as NodePath) #ivo 4.2
 	remove_child(node)
 	node.free()
 	return
@@ -820,7 +818,7 @@ func rmove_node():
 	if  not selected.selected:
 		hint("No Node Selected")
 		return
-	if  (selected as GraphNode).offset.is_equal_approx(root_offset):
+	if  (selected as GraphNode).position_offset.is_equal_approx(root_offset): #ivo
 		return
 	
 	var nodes = []
@@ -842,7 +840,7 @@ func rmove_node():
 		return
 	
 	var rn = get_node(cp.name)
-	var shifted = root_offset - rn.offset
+	var shifted = root_offset - rn.position_offset #ivo
 	
 	var shifted_name = []
 	for i in nodes:
@@ -858,7 +856,7 @@ func shift_nodes(names, shifted):
 	for i in names:
 		if  has_node(i):
 			var node:GraphNode = get_node(i)
-			node.offset += shifted
+			node.position_offset += shifted #ivo
 	return
 
 func rec_populate(root, nodes:Array):
@@ -870,7 +868,6 @@ func rec_populate(root, nodes:Array):
 
 func node_selected(node):
 	selected = node
-	node_selected_handle_footer()
 	return
 
 func focus_selected():
@@ -878,7 +875,7 @@ func focus_selected():
 		return
 	if  not selected.selected:
 		return
-	scroll_offset = selected.offset * zoom - ((rect_size / 2) - (selected.rect_size / 2))
+	scroll_offset = selected.position_offset * zoom - ((size / 2) - (selected.size / 2)) #ivo
 	return
 
 var tindex = 0
@@ -888,27 +885,27 @@ func _on_search_bar_text_changed(new_text):
 	tindex = 0
 	search_text = new_text
 	var tpairs = comp_pairs(new_text)
-	if  not tpairs.empty():
+	if  not tpairs.is_empty():
 		var si = tpairs[tindex][1]
-		scroll_offset = si.offset * zoom - ((rect_size / 2) - (si.rect_size / 2))
+		scroll_offset = si.position_ * zoom - ((size / 2) - (si.size / 2)) #ivo
 	return
 
 func _on_next_pressed():
 	tindex += 1
 	var tpairs = comp_pairs(search_text)
-	if  not tpairs.empty():
+	if  not tpairs.is_empty():
 		tindex = clamp(tindex, 0, tpairs.size() - 1)
 		var si = tpairs[tindex][1]
-		scroll_offset = si.offset * zoom - ((rect_size / 2) - (si.rect_size / 2))
+		scroll_offset = si.position_offset * zoom - ((size / 2) - (si.size / 2)) #ivo
 	return
 
 func _on_prev_pressed():
 	tindex -= 1
 	var tpairs = comp_pairs(search_text)
-	if  not tpairs.empty():
+	if  not tpairs.is_empty():
 		tindex = clamp(tindex, 0, tpairs.size() - 1)
 		var si = tpairs[tindex][1]
-		scroll_offset = si.offset * zoom - ((rect_size / 2) - (si.rect_size / 2))
+		scroll_offset = si.position_offset * zoom - ((size / 2) - (si.size / 2)) #ivo
 	return
 
 func comp_pairs(text):
@@ -921,13 +918,13 @@ func comp_pairs(text):
 			var similarity = itoken.similarity(text)
 			if  similarity > 0.2:
 				tpairs.append([itoken.similarity(text), i])
-	tpairs.sort_custom(self, "sort_tp")
+	tpairs.sort_custom(Callable(self, "sort_tp"))
 	return tpairs
 
 func sort_tp(a, b):
 	return a[0] > b[0]
 
-export(NodePath) var create_path
+@export var create_path: NodePath
 
 func popup_request(position):
 	var create = get_node(create_path)
@@ -945,7 +942,7 @@ func _on_help_pressed():
 	return
 
 func _process(delta):
-	if  not dragged_nodes.empty():
+	if  not dragged_nodes.is_empty():
 		var redo = []
 		var undo = []
 		for i in dragged_nodes:
@@ -960,9 +957,9 @@ func _process(delta):
 
 func update_node_offset(node_offset):
 	for i in node_offset:
-		var n:GraphNode = get_node_or_null(i[0])
+		var n:GraphNode = get_node_or_null(i[0] as NodePath) #ivo
 		if  n:
-			n.offset = (i[1] / snap_distance) * snap_distance
+			n.position_offset = (i[1] / snapping_distance) * snapping_distance
 	return
 
 var dragged_nodes = []
@@ -1003,7 +1000,7 @@ func load_from(data):
 			var node:GraphNode = create_node(n)
 			add_child(node)
 	for c in data.connection:
-		connect_node(c.from, c.from_port, c.to, c.to_port)
+		connect_node(c.from_node, c.from_port, c.to_node, c.to_port)
 	return
 
 var param_scene = preload("res://addons/btree/Editor/task/param.tscn")
@@ -1018,7 +1015,7 @@ func add_param(name):
 	return
 
 func add_last(name):
-	var node = get_node(name)
+	var node:GraphNode = get_node(name as NodePath) #ivo
 	node.params.clear()
 	var np = node.get_node("Params")
 	for i in np.get_children():
@@ -1036,12 +1033,12 @@ func del_last(name):
 	return
 
 func sync_data_and_node(name):
-	var node = get_node(name)
+	var node:GraphNode = get_node(name as NodePath) #ivo
 	var params:Array = node.params
 	var target = node.get_node("Params")
 	while params.size() > target.get_child_count():
-		var inst = param_scene.instance()
-		inst.connect("remove_me", node, "remove_param")
+		var inst = param_scene.instantiate()
+		inst.connect("remove_me", Callable(node, "remove_param"))
 		target.add_child(inst)
 	while params.size() < target.get_child_count():
 		var del = target.get_child(0)
@@ -1051,7 +1048,7 @@ func sync_data_and_node(name):
 		var sel = target.get_child(i)
 		sel.set_value(params[i])
 		sel.update_label()
-	node.rect_size = Vector2.ZERO
+	node.size = Vector2.ZERO
 	return
 
 func del_param(name, index):
@@ -1079,7 +1076,7 @@ func cls_index(name, index):
 	params.clear()
 	for i in np.get_children():
 		params.append(i.get_value())
-	params.remove(index)
+	params.remove_at(index) #ivo 4.1.1
 	return
 
 func ins_index(name, index, value):
@@ -1092,51 +1089,18 @@ func ins_index(name, index, value):
 	params.insert(index, value)
 	return
 
-var name_text = ""
-
-func submit_name_change():
-	if selected is GraphNode and selected.name != "root":
-		var name_bar = get_parent().get_node('footer/name/name_bar')
-		name_bar.release_focus()
-		var new_name = name_text
-		var old_name = selected.title
-		undo_redo.create_action("change node name")
-		undo_redo.add_do_method(self, "change_node_name", new_name, name_bar)
-		undo_redo.add_undo_method(self, "undo_change_node_name", old_name, name_bar)
-		undo_redo.commit_action()
-
-func _on_change_name_pressed():
-	submit_name_change()
-
-func change_node_name(new_name, name_line_edit):	
-	if selected:
-		selected.title = new_name
-		name_line_edit.text = new_name
-	else:
-		name_line_edit.text = ""
-	
-
-func undo_change_node_name(old_name, name_line_edit):
-	if selected:
-		name_line_edit.text = old_name
-		selected.title = old_name
-	else:
-		name_line_edit.text = ""
-
-func node_selected_handle_footer():
-	name_text = selected.title
-	var name_bar = get_parent().get_node('footer/name/name_bar')
-	name_bar.text = name_text
-	if(selected.name == "root"):
-		name_bar.editable = false
-	else:
-		name_bar.editable = true
-
-
-func _on_name_bar_text_changed(new_text):
-	name_text = new_text
-
-
-
-func _on_name_bar_text_entered(new_text):
-	submit_name_change()
+#ivo ##############################################	
+func add_grnode_close_button(node:GraphNode):
+	var titlebar:HBoxContainer = node.get_titlebar_hbox()
+	var close_button:Button
+	if titlebar.get_child_count() > 1:
+		close_button = titlebar.find_child("close_button")
+		if close_button:
+			titlebar.remove_child(close_button)
+			close_button.queue_free()
+	close_button = Button.new()
+	close_button.name = "close_button"
+	close_button.text = "x"
+	titlebar.add_child(close_button)
+	close_button.pressed.connect(child_delete.bind(node)) 
+	##################################################	

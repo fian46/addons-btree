@@ -1,39 +1,50 @@
-tool
+@tool
 extends Node
 
-var client:WebSocketClient = WebSocketClient.new()
+#var client:WebSocketClient = WebSocketClient.new()
+#var client:WebSocketMultiplayerPeer = WebSocketMultiplayerPeer.new() #ivo
+var client:WebSocketClient = WebSocketClient.new() #ivo
 
-func is_debug():
-	return client.get_connection_status() == 2
+#func is_debug():
+func is_debug(): #ivo
+	return client.get_peer().get_ready_state() == WebSocketPeer.STATE_OPEN #ivo 4.1.1
 
 func ensure_connection():
 	if  client:
-		if client.get_connection_status() == 0:
-			client = WebSocketClient.new()
+		if client.get_peer().get_ready_state() != WebSocketPeer.STATE_OPEN: #ivo 4.1.1
+			client = WebSocketClient.new() #ivo
 			client.connect_to_url("127.0.0.1:7777")
-			client.connect("connection_established", self, "connected")
-			client.connect("connection_closed", self, "disconected")
-			client.connect("connection_error", self, "failed")
-			client.connect("data_received", self, "data")
+			client.connection_established.connect(connected)
+			client.connection_closed.connect(disconected)
+			client.connection_error.connect(failed)
+			client.data_received.connect(data)
+			client.text_received.connect(_on_text_received) #ivo
 	return
 
-func data():
-	var peer = client.get_peer(1)
-	var msg = peer.get_var(true)
+func _on_text_received(wspeer, message): #ivo
+	print("_on_text_received")
+	pass
+
+#func data():
+func data(wspeer, message, is_string): #WebSocketClient
+	var peer = client.get_peer() #ivo
+	var msg = message.decode_var(0)
 	get_parent().read(msg)
 	return
 
 var queue = []
 
 func write(msg):
-	var status = client.get_connection_status()
-	if  status == 2 or status == 1:
+	#var status = client.get_connection_status()
+	var status = client.get_peer().get_ready_state() #ivo
+	if  status == WebSocketPeer.STATE_OPEN: #ivo
 		queue.append(msg)
 	return
 
 func is_debug_started():
 	if  client:
-		return client.get_connection_status() == 2
+		#return client.get_connection_status() == 2
+		return client.get_peer().get_connection_status() == WebSocketPeer.STATE_OPEN #ivo 4.1.1
 	else:
 		return false
 
@@ -42,7 +53,9 @@ func failed():
 	print("BT debug error, instance not found")
 	return
 
-func connected(protocol):
+#func connected(protocol):
+func connected(peer, protocol): #ivo
+	print(peer)
 	print("BT debug started")
 	return
 
@@ -53,9 +66,11 @@ func disconected(was_it_clean):
 
 func _process(delta):
 	if  client:
-		if  client.get_connection_status() != 0:
-			while queue.size() > 0 and client.get_connection_status() == 2:
+		if  client.is_listening():
+			while queue.size() > 0 and  client.get_peer().get_ready_state() == WebSocketPeer.STATE_OPEN:
 				var front = queue.pop_front()
-				client.get_peer(1).put_var(front, true)
+				client.get_peer().put_var(front, true)
 			client.poll()
 	return
+
+	

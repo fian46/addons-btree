@@ -3,9 +3,9 @@
 [ext_resource path="res://addons/btree/Editor/inverter/inverter.gd" type="Script" id=1]
 
 [node name="inverter" type="GraphNode"]
-margin_right = 92.0
-margin_bottom = 43.0
-hint_tooltip = "the child result always succeed"
+offset_right = 92.0
+offset_bottom = 43.0
+tooltip_text = "the child result always succeed"
 title = "inverter"
 show_close = true
 resizable = true
@@ -21,7 +21,7 @@ __meta__ = {
 }
 
 [node name="slot0" type="Label" parent="."]
-margin_left = 16.0
-margin_top = 24.0
-margin_right = 79.0
-margin_bottom = 38.0
+offset_left = 16.0
+offset_top = 24.0
+offset_right = 79.0
+offset_bottom = 38.0

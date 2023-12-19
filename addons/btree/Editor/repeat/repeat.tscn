@@ -4,11 +4,11 @@
 [ext_resource path="res://addons/btree/Editor/repeat/count.gd" type="Script" id=2]
 
 [node name="repeat" type="GraphNode"]
-margin_left = 0.630249
-margin_top = -0.630249
-margin_right = 159.63
-margin_bottom = 52.3698
-hint_tooltip = "if count == 0 repeat until child failed, if count > 0 repeat child for x tick then succeed"
+offset_left = 0.630249
+offset_top = -0.630249
+offset_right = 159.63
+offset_bottom = 52.3698
+tooltip_text = "if count == 0 repeat until child failed, if count > 0 repeat child for x tick then succeed"
 title = "repeat"
 show_close = true
 resizable = true
@@ -24,21 +24,21 @@ __meta__ = {
 }
 
 [node name="slot0" type="HBoxContainer" parent="."]
-margin_left = 16.0
-margin_top = 24.0
-margin_right = 143.0
-margin_bottom = 48.0
+offset_left = 16.0
+offset_top = 24.0
+offset_right = 143.0
+offset_bottom = 48.0
 
 [node name="Label" type="Label" parent="slot0"]
-margin_top = 5.0
-margin_right = 49.0
-margin_bottom = 19.0
+offset_top = 5.0
+offset_right = 49.0
+offset_bottom = 19.0
 text = "Count : "
 
 [node name="count" type="SpinBox" parent="slot0"]
-margin_left = 53.0
-margin_right = 127.0
-margin_bottom = 24.0
+offset_left = 53.0
+offset_right = 127.0
+offset_bottom = 24.0
 size_flags_horizontal = 3
 allow_greater = true
 script = ExtResource( 2 )

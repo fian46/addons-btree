@@ -1,30 +1,37 @@
-[gd_scene format=2]
+[gd_scene load_steps=2 format=3 uid="uid://oqfoun8x2s8k"]
 
-[node name="help" type="WindowDialog"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -248.0
-margin_top = -70.0
-margin_right = 252.0
-margin_bottom = 153.0
-popup_exclusive = true
-window_title = "Help"
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[sub_resource type="GDScript" id="GDScript_6gbv1"]
+script/source = "@tool
+extends Window
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+
+
+func _on_close_requested():
+	self.hide() #ivo
+	pass # Replace with function body.
+"
+
+[node name="help" type="Window"]
+size = Vector2i(640, 320)
+visible = false
+script = SubResource("GDScript_6gbv1")
 
 [node name="scroll" type="ScrollContainer" parent="."]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="text" type="Label" parent="scroll"]
-margin_right = 500.0
-margin_bottom = 184.0
+layout_mode = 2
 size_flags_horizontal = 3
 text = "Control + F = Focus to selected node
 Control + S = Save
@@ -36,9 +43,6 @@ Control + Shift + Mouse Scroll = Zoom In/Out
 (Select a node)  and Control + Shift + M = Minimize Node
 To debug please run your game first and press debug button in toolbar
 To perform hot reload, run your game, press debug to start debug and close debug window back to edit window. Save the edited btree after modify it will perform hot reload."
-align = 1
-valign = 1
-autowrap = true
-__meta__ = {
-"_edit_use_anchors_": false
-}
+autowrap_mode = 2
+
+[connection signal="close_requested" from="." to="." method="_on_close_requested"]

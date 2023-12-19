@@ -1,0 +1,101 @@
+[gd_scene load_steps=4 format=3 uid="uid://b21x7hfj2rx3s"]
+
+[ext_resource type="Script" path="res://addons/btree/Editor/TreeEditor.gd" id="1"]
+[ext_resource type="Script" path="res://addons/btree/Editor/Create.gd" id="2"]
+[ext_resource type="PackedScene" uid="uid://cqdbvcfj4o0oc" path="res://addons/btree/Editor/tree_root/root.tscn" id="3"]
+
+[node name="TreeEditor" type="GraphEdit"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+right_disconnects = true
+zoom = 0.578704
+script = ExtResource("1")
+
+[node name="group" type="HBoxContainer" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 12.0
+offset_right = -12.0
+offset_bottom = 20.0
+alignment = 2
+
+[node name="Create" type="MenuButton" parent="group"]
+layout_mode = 2
+text = "Create"
+item_count = 16
+popup/item_0/text = "Task"
+popup/item_0/id = 1
+popup/item_1/text = "Selector"
+popup/item_1/id = 3
+popup/item_2/text = "Sequence"
+popup/item_2/id = 2
+popup/item_3/text = "Priority Selector"
+popup/item_3/id = 4
+popup/item_4/text = "Priority Condition"
+popup/item_4/id = 5
+popup/item_5/text = "Paralel"
+popup/item_5/id = 6
+popup/item_6/text = "Mute"
+popup/item_6/id = 7
+popup/item_7/text = "Repeat"
+popup/item_7/id = 8
+popup/item_8/text = "While Node"
+popup/item_8/id = 9
+popup/item_9/text = "Wait Node"
+popup/item_9/id = 10
+popup/item_10/text = "Race Node"
+popup/item_10/id = 11
+popup/item_11/text = "Random Selector"
+popup/item_11/id = 12
+popup/item_12/text = "Random Sequence"
+popup/item_12/id = 13
+popup/item_13/text = "Inverter"
+popup/item_13/id = 14
+popup/item_14/text = "Random Repeat"
+popup/item_14/id = 15
+popup/item_15/text = "Random Wait"
+popup/item_15/id = 16
+script = ExtResource("2")
+
+[node name="save" type="Button" parent="group"]
+layout_mode = 2
+text = "Save"
+
+[node name="help" type="Button" parent="group"]
+layout_mode = 2
+toggle_mode = true
+text = "Help"
+
+[node name="root" parent="." instance=ExtResource("3")]
+layout_mode = 0
+scale = Vector2(0.578704, 0.578704)
+mouse_filter = 1
+title = "root"
+
+[node name="search" type="HBoxContainer" parent="."]
+layout_mode = 0
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -480.0
+offset_top = -37.0
+offset_right = -15.0
+offset_bottom = -13.0
+alignment = 2
+
+[node name="Label" type="Label" parent="search"]
+layout_mode = 2
+text = "Search Node : "
+
+[node name="search_bar" type="LineEdit" parent="search"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[connection signal="connection_request" from="." to="." method="_on_TreeEditor_connection_request"]
+[connection signal="disconnection_request" from="." to="." method="_on_TreeEditor_disconnection_request"]
+[connection signal="node_selected" from="." to="." method="_on_TreeEditor_node_selected"]
+[connection signal="pressed" from="group/save" to="." method="_on_save_pressed"]
+[connection signal="toggled" from="group/help" to="." method="_on_help_toggled"]
+[connection signal="text_changed" from="search/search_bar" to="." method="_on_search_bar_text_changed"]

@@ -1,37 +1,40 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=5 format=3 uid="uid://tf8lj1x71hts"]
 
-[ext_resource path="res://addons/btree/Editor/test.gd" type="Script" id=1]
-[ext_resource path="res://addons/btree/Editor/editor.tscn" type="PackedScene" id=2]
-[ext_resource path="res://addons/btree/Editor/help.tscn" type="PackedScene" id=3]
-[ext_resource path="res://addons/btree/Editor/rtree.tscn" type="PackedScene" id=4]
+[ext_resource type="Script" path="res://addons/btree/Editor/test.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://cjcsvawt0fqcx" path="res://addons/btree/Editor/editor.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://oqfoun8x2s8k" path="res://addons/btree/Editor/help.tscn" id="3"]
+[ext_resource type="PackedScene" uid="uid://brnul2menjchk" path="res://addons/btree/Editor/rtree.tscn" id="4"]
 
 [node name="test" type="Panel"]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+script = ExtResource("1")
 
-[node name="editor" parent="." instance=ExtResource( 2 )]
+[node name="editor" parent="." instance=ExtResource("2")]
+layout_mode = 1
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="halt" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 0
-custom_colors/font_color = Color( 1, 0, 0, 1 )
+theme_override_colors/font_color = Color(1, 0, 0, 1)
 text = "No BTREE node is selected OR the parent node not have any script OR parent node script is error"
-align = 1
-valign = 1
-autowrap = true
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
-[node name="help" parent="." instance=ExtResource( 3 )]
+[node name="help" parent="." instance=ExtResource("3")]
+position = Vector2i(0, 36)
 
-[node name="rtree" parent="." instance=ExtResource( 4 )]
+[node name="rtree" parent="." instance=ExtResource("4")]
+position = Vector2i(0, 36)
