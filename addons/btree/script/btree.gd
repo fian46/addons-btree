@@ -2,11 +2,11 @@ extends Node
 
 const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
 
-export(Dictionary) var tree = {}
-export(bool) var enable = true
-export(int, '_process', '_physics_process') var run_on = 0
-export(int, "resume", "restart") var on_enable = 0
-export(String) var _tree_id = ""
+@export var tree: Dictionary = {}
+@export var enable: bool = true
+@export var run_on = 0 # (int, '_process', '_physics_process')
+@export var on_enable = 0 # (int, "resume", "restart")
+@export var _tree_id: String = ""
 var rtree: Runtime.TNode = null
 var swap_tree
 
@@ -19,11 +19,11 @@ func _ready():
 
 func generate_id():
 	var cn:Node = self
-	while cn != null && (cn.filename == "" || cn.filename == null):
+	while cn != null && (cn.scene_file_path == "" || cn.scene_file_path == null): #ivo 4.1.1
 		cn = cn.get_parent()
 	if  cn:
 		var path = cn.get_path_to(self)
-		_tree_id = str(hash(cn.filename)) + str(hash(str(path)))
+		_tree_id = str(hash(cn.scene_file_path)) + str(hash(str(path))) #ivo 4.1.1
 	return
 
 func _enter_tree():

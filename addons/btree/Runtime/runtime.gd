@@ -1,4 +1,4 @@
-extends Reference
+extends RefCounted
 
 enum Status {
 	RUNNING = 0,
@@ -8,7 +8,6 @@ enum Status {
 
 class TNode:
 	var name:String
-	var title:String
 	var status: int = Status.RUNNING
 	var ticked := false
 	
@@ -38,7 +37,7 @@ class CompositeTNode extends TNode:
 	var children := []
 	
 	func reset():
-		.reset()
+		super.reset()
 		for c in children:
 			if  c.ticked:
 				c.reset()
@@ -48,7 +47,7 @@ class DecoratorTNode extends TNode:
 	var child: TNode
 	
 	func reset():
-		.reset()
+		super.reset()
 		if  child and child.ticked:
 			child.reset()
 		return
@@ -58,7 +57,7 @@ class Race extends CompositeTNode:
 		ticked = true
 		if  status != Status.RUNNING:
 			return status
-		if  children.empty():
+		if  children.is_empty():
 			return succeed()
 		var fcount = 0
 		for c in children:
@@ -82,7 +81,7 @@ class Paralel extends CompositeTNode:
 		if  status != Status.RUNNING:
 			return status
 		
-		if  children.empty():
+		if  children.is_empty():
 			return succeed()
 		
 		var scount = 0
@@ -105,14 +104,14 @@ class PSelector extends CompositeTNode:
 	
 	func reset():
 		running_child = -1
-		.reset()
+		super.reset()
 		return
 	
 	func tick() -> int:
 		ticked = true
 		if  status != Status.RUNNING:
 			return status
-		if  children.empty():
+		if  children.is_empty():
 			return failed()
 		for i in range(0, children.size()):
 			var c = children[i]
@@ -133,43 +132,48 @@ class PSelector extends CompositeTNode:
 		return failed()
 
 class PCondition extends DecoratorTNode:
-	var target:FuncRef
+	#var target:FuncRef
+	var target: Callable #ivo
 	var params := []
 	var fn:String
-	var is_init = false
+	var is_init_var = false #var is_init = false #ivo 4.1.1
 	
 	func _init():
 		status = Status.FAILED
 		return
 	
 	func reset():
-		.reset()
+		super.reset()
 		status = Status.FAILED
 		return
 	
 	func setup(data: Dictionary, target):
-		.setup(data, target)
+		super.setup(data, target)
 		if  data.fn:
-			self.target = funcref(target, data.fn)
+			#self.target = funcref(target, data.fn)
+			self.target = Callable(target, data.fn) #ivo			
 		self.fn = str(data.fn)
 		params = data.get('values', [])
 		return
 	
 	func tick() -> int:
-		is_init = not ticked
+		#is_init = not ticked
+		is_init_var = not ticked #ivo
 		ticked = true
 		if  not child:
 			return failed()
 		if  not target:
 			return failed()
-		target.call_func(self)
+		#target.call_func(self)
+		target.call(self) #ivo #.call_deferred
 		return status
 	
 	func is_init():
-		return is_init
+		#return is_init
+		return is_init_var #ivo
 	
 	func get_param(idx):
-		if  params.empty():
+		if  params.is_empty():
 			print("BT error param index : {", idx, "} for node ", name)
 			return null
 		if  idx < 0 and idx >= params.size():
@@ -190,34 +194,40 @@ class Root extends DecoratorTNode:
 		return child.tick()
 
 class Task extends TNode:
-	var target: FuncRef
+	#var target: FuncRef
+	var target: Callable #ivo
 	var params := []
 	var fn:String
-	var is_init = false
+	#var is_init = false
+	var is_init_var = false #ivo 
 	
 	func setup(data: Dictionary, target):
-		.setup(data, target)
+		super.setup(data, target)
 		if  data.fn:
-			self.target = funcref(target, data.fn)
+			#self.target = funcref(target, data.fn)
+			self.target = Callable(target, data.fn) #ivo
 		self.fn = str(data.fn)
 		params = data.get('values', [])
 		return
 	
 	func tick() -> int:
-		is_init = not ticked
+		#is_init = not ticked
+		is_init_var = not ticked #ivo
 		ticked = true
 		if  status != Status.RUNNING:
 			return status
 		if  not target:
 			return failed()
-		target.call_func(self)
+		#target.call_func(self)
+		target.call(self) #ivo
 		return status
 	
 	func is_init():
-		return is_init
+		#return is_init
+		return is_init_var #ivo
 	
 	func get_param(idx):
-		if  params.empty():
+		if  params.is_empty():
 			print("BT error param index : {", idx, "} for node ", name)
 			return null
 		if  idx < 0 and idx >= params.size():
@@ -232,7 +242,7 @@ class Sequence extends CompositeTNode:
 	var current_child = 0
 	
 	func reset():
-		.reset()
+		super.reset()
 		current_child = 0
 		return
 	
@@ -240,7 +250,7 @@ class Sequence extends CompositeTNode:
 		ticked = true
 		if  status != Status.RUNNING:
 			return status
-		if  children.empty():
+		if  children.is_empty():
 			return succeed()
 		for i in range(current_child, children.size()):
 			current_child = i
@@ -254,7 +264,7 @@ class Sequence extends CompositeTNode:
 
 class RandomSequence extends Sequence:
 	func reset():
-		.reset()
+		super.reset()
 		children.shuffle()
 		return
 
@@ -262,7 +272,7 @@ class Selector extends CompositeTNode:
 	var current_child = 0
 	
 	func reset():
-		.reset()
+		super.reset()
 		current_child = 0
 		return
 	
@@ -270,7 +280,7 @@ class Selector extends CompositeTNode:
 		ticked = true
 		if  status != Status.RUNNING:
 			return status
-		if  children.empty():
+		if  children.is_empty():
 			return succeed()
 		for i in range(current_child, children.size()):
 			current_child = i
@@ -284,7 +294,7 @@ class Selector extends CompositeTNode:
 
 class RandomSelector extends Selector:
 	func reset():
-		.reset()
+		super.reset()
 		children.shuffle()
 		return
 
@@ -318,14 +328,14 @@ class RandomRepeat extends DecoratorTNode:
 	var ranges = 0
 	
 	func setup(data: Dictionary, target):
-		.setup(data, target)
+		super.setup(data, target)
 		count = data.count
 		tick_count = count
 		ranges = int(data.ranges)
 		return
 	
 	func reset():
-		.reset()
+		super.reset()
 		tick_count = count + round(randi() % int(ranges))
 		return
 	
@@ -357,13 +367,13 @@ class Repeat extends DecoratorTNode:
 	var count = 0
 	
 	func setup(data: Dictionary, target):
-		.setup(data, target)
+		super.setup(data, target)
 		count = data.count
 		tick_count = count
 		return
 	
 	func reset():
-		.reset()
+		super.reset()
 		tick_count = count
 		return
 	
@@ -390,21 +400,25 @@ class Repeat extends DecoratorTNode:
 		return status
 
 class WhileNode extends DecoratorTNode:
-	var target: FuncRef
+	#var target: FuncRef
+	var target: Callable #ivo
 	var params := []
 	var fn:String
-	var is_init = false
+	#var is_init = false
+	var is_init_var = false #ivo
 	
 	func setup(data: Dictionary, target):
-		.setup(data, target)
+		super.setup(data, target)
 		if  data.fn:
-			self.target = funcref(target, data.fn)
+			#self.target = funcref(target, data.fn)
+			self.target = Callable(target, data.fn) #ivo
 		self.fn = str(data.fn)
 		params = data.get('values', [])
 		return
 	
 	func tick() -> int:
-		is_init = not ticked
+		#is_init = not ticked
+		is_init_var = not ticked #ivo
 		ticked = true
 		if  status != Status.RUNNING:
 			return status
@@ -413,16 +427,18 @@ class WhileNode extends DecoratorTNode:
 		failed()
 		if  not target:
 			return failed()
-		target.call_func(self)
+		#target.call_func(self)
+		target.call(self) #ivo
 		if  status == Status.SUCCEED:
 			status = child.tick()
 		return status
 	
 	func is_init():
-		return is_init
+		#return is_init
+		return is_init_var #ivo		
 	
 	func get_param(idx):
-		if  params.empty():
+		if  params.is_empty():
 			print("BT error param index : {", idx, "} for node ", name)
 			return null
 		if  idx < 0 and idx >= params.size():
@@ -438,13 +454,13 @@ class WaitNode extends TNode:
 	var count = 0
 	
 	func setup(data: Dictionary, target):
-		.setup(data, target)
+		super.setup(data, target)
 		count = data.count
 		tick_count = count
 		return
 	
 	func reset():
-		.reset()
+		super.reset()
 		tick_count = count
 		return
 	
@@ -465,14 +481,14 @@ class RandomWaitNode extends TNode:
 	var ranges = 0
 	
 	func setup(data: Dictionary, target):
-		.setup(data, target)
+		super.setup(data, target)
 		count = data.count
 		tick_count = count
 		ranges = data.ranges
 		return
 	
 	func reset():
-		.reset()
+		super.reset()
 		tick_count = count + round(randi() % int(ranges))
 		return
 	
@@ -509,9 +525,9 @@ enum TNodeTypes {
 	MINIM = 99
 }
 
-const constructors = {}
+static var constructors = {} #ivo 4.2
 static func get_constructors() -> Dictionary:
-	if  not constructors.empty():
+	if  not constructors.is_empty():
 		return constructors
 	constructors[TNodeTypes.ROOT] = Root
 	constructors[TNodeTypes.TASK] = Task
@@ -533,7 +549,7 @@ static func get_constructors() -> Dictionary:
 	return constructors
 
 static func create_runtime(data: Dictionary, target) -> TNode:
-	if  data.empty():
+	if  data.is_empty():
 		return null
 
 	if  data.type == TNodeTypes.MINIM:
@@ -542,14 +558,9 @@ static func create_runtime(data: Dictionary, target) -> TNode:
 	var tnode_type = get_constructors().get(data.type)
 	var current: TNode = tnode_type.new()
 	current.name = data.name
-	if data.has("data") && data.data.has("title"):
-		current.title = data.data.title
-	else:
-		current.title = data.name
-	
 	current.setup(data.data, target)
 
-	for child in data.child:		
+	for child in data.child:
 		var tnode_child = create_runtime(child, target)
 		if  current is CompositeTNode:
 			current.children.append(tnode_child)

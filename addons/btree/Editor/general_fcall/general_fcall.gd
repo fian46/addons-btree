@@ -1,5 +1,5 @@
-tool
-extends BehaviorTreeNode
+@tool
+extends GraphNode
 
 const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
 var type = Runtime.TNodeTypes.TASK
@@ -7,8 +7,9 @@ var load_function = ""
 var params = []
 var param_scene = preload("res://addons/btree/Editor/task/param.tscn")
 
-func _ready():	
-	$Input/Add.connect("pressed", self, "add_pressed")
+func _ready():
+	connect("delete_request", Callable(self, "self_close")) #ivo 4.2 ????
+	$Input/Add.connect("pressed", Callable(self, "add_pressed"))
 	return
 
 func search_token():
@@ -19,6 +20,7 @@ func search_token():
 	return str(name, " | ", fname)
 
 func _enter_tree():
+	title = name
 	update()
 	var opt = $Main/Required/opt_function
 	for i in range(opt.get_item_count()):
@@ -28,31 +30,28 @@ func _enter_tree():
 		else:
 			opt.selected = 0
 	for i in params:
-		var input = param_scene.instance()
-		input.connect("remove_me", self, "remove_param")
-		input.set_value(i)
+		var input = param_scene.instantiate()
+		input.connect("remove_me", Callable(self, "remove_param"))
+		input.call_deferred("set_value", i)
 		$Params.add_child(input)
 		input.update_label()
 	return
 
 func as_task():
 	name = "task"
-	title = name
 	type = Runtime.TNodeTypes.TASK
 	return
 
 func as_priority_condition():
 	name = "priority_condition"
-	title = name
 	type = Runtime.TNodeTypes.PRIORITY_CONDITION
-	set_slot(0, true, 1, Color.yellow, true, 0, Color.blue)
+	set_slot(0, true, 1, Color.YELLOW, true, 0, Color.BLUE)
 	return
 
 func as_while():
 	name = "while_node"
-	title = name
 	type = Runtime.TNodeTypes.WHILE
-	set_slot(0, true, 0, Color.blue, true, 0, Color.blue)
+	set_slot(0, true, 0, Color.BLUE, true, 0, Color.BLUE)
 	return
 
 func update():
@@ -71,8 +70,7 @@ func update():
 	
 	var script = get_parent().root_object.get_script()
 	var path = script.resource_path
-	var file = File.new()
-	file.open(path, File.READ)
+	var file = FileAccess.open(path, FileAccess.READ) #ivo 4.1.1
 	var source = file.get_as_text()
 	file.close()
 	var lscript:GDScript = GDScript.new()
@@ -95,8 +93,13 @@ func update():
 			opt.selected = old_sel
 	return
 
+func self_close():
+	get_parent().child_delete(self)
+	return
+
 func set_data(data):
-	.set_data(data)
+	position_offset = data.offset #ivo
+	size = data.size
 	load_function = data.fn
 	if  data.has("params"):
 		params = data.params
@@ -105,7 +108,6 @@ func set_data(data):
 	return
 
 func get_data():
-	var ret_data = .get_data()
 	var opt = $Main/Required/opt_function
 	var sel = $Main/Required/opt_function.selected
 	var fname = null
@@ -119,12 +121,13 @@ func get_data():
 		var val = pr.get_child(i).get_value()
 		ret_param.append(val)
 		values.append(val[0])
-	
-	#add node specific data
-	ret_data.fn = fname
-	ret_data.params = ret_param
-	ret_data.values = values
-	
+	var ret_data = {
+		"offset":position_offset, #ivo
+		"size":size,
+		"fn":fname,
+		"params":ret_param,
+		"values":values
+	}
 	return ret_data
 
 func add_pressed():

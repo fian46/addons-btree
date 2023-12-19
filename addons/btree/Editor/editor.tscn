@@ -1,143 +1,127 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=4 format=3 uid="uid://cjcsvawt0fqcx"]
 
-[ext_resource path="res://addons/btree/Editor/create.gd" type="Script" id=1]
-[ext_resource path="res://addons/btree/Editor/tree_root/root.tscn" type="PackedScene" id=2]
-[ext_resource path="res://addons/btree/Editor/graph.gd" type="Script" id=5]
+[ext_resource type="Script" path="res://addons/btree/Editor/create.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://cqdbvcfj4o0oc" path="res://addons/btree/Editor/tree_root/root.tscn" id="2"]
+[ext_resource type="Script" path="res://addons/btree/Editor/graph.gd" id="5"]
 
 [node name="editor" type="VBoxContainer"]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="group" type="HBoxContainer" parent="."]
-margin_right = 1024.0
-margin_bottom = 20.0
+layout_mode = 2
 alignment = 2
 
 [node name="create" type="MenuButton" parent="group"]
-margin_left = 823.0
-margin_right = 876.0
-margin_bottom = 20.0
+layout_mode = 2
 text = "Create"
-items = [ "Task", null, 0, false, false, 1, 0, null, "", false, "Selector", null, 0, false, false, 3, 0, null, "", false, "Sequence", null, 0, false, false, 2, 0, null, "", false, "Priority Selector", null, 0, false, false, 4, 0, null, "", false, "Priority Condition", null, 0, false, false, 5, 0, null, "", false, "Paralel", null, 0, false, false, 6, 0, null, "", false, "Mute", null, 0, false, false, 7, 0, null, "", false, "Repeat", null, 0, false, false, 8, 0, null, "", false, "While Node", null, 0, false, false, 9, 0, null, "", false, "Wait Node", null, 0, false, false, 10, 0, null, "", false, "Race Node", null, 0, false, false, 11, 0, null, "", false, "Random Selector", null, 0, false, false, 12, 0, null, "", false, "Random Sequence", null, 0, false, false, 13, 0, null, "", false, "Inverter", null, 0, false, false, 14, 0, null, "", false, "Random Repeat", null, 0, false, false, 15, 0, null, "", false, "Random Wait", null, 0, false, false, 16, 0, null, "", false ]
-script = ExtResource( 1 )
+item_count = 17
+popup/item_0/text = "Task"
+popup/item_0/id = 1
+popup/item_1/text = "Selector"
+popup/item_1/id = 3
+popup/item_2/text = "Sequence"
+popup/item_2/id = 2
+popup/item_3/text = "Priority Selector"
+popup/item_3/id = 4
+popup/item_4/text = "Priority Condition"
+popup/item_4/id = 5
+popup/item_5/text = "Paralel"
+popup/item_5/id = 6
+popup/item_6/text = "Mute"
+popup/item_6/id = 7
+popup/item_7/text = "Repeat"
+popup/item_7/id = 8
+popup/item_8/text = "While Node"
+popup/item_8/id = 9
+popup/item_9/text = "Wait Node"
+popup/item_9/id = 10
+popup/item_10/text = "Race Node"
+popup/item_10/id = 11
+popup/item_11/text = "Random Selector"
+popup/item_11/id = 12
+popup/item_12/text = "Random Sequence"
+popup/item_12/id = 13
+popup/item_13/text = "Inverter"
+popup/item_13/id = 14
+popup/item_14/text = "Random Repeat"
+popup/item_14/id = 15
+popup/item_15/text = "Random Wait"
+popup/item_15/id = 16
+popup/item_16/text = "Delete Selected Node"
+popup/item_16/id = -11
+script = ExtResource("1")
 graph_path = NodePath("../../graph")
 hint_path = NodePath("../../footer/hint")
 
 [node name="save" type="Button" parent="group"]
-margin_left = 880.0
-margin_right = 921.0
-margin_bottom = 20.0
+layout_mode = 2
 text = "Save"
 
 [node name="debug" type="Button" parent="group"]
-margin_left = 925.0
-margin_right = 978.0
-margin_bottom = 20.0
+layout_mode = 2
 text = "Debug"
 
 [node name="help" type="Button" parent="group"]
-margin_left = 982.0
-margin_right = 1024.0
-margin_bottom = 20.0
+layout_mode = 2
 text = "Help"
 
 [node name="graph" type="GraphEdit" parent="."]
-margin_top = 24.0
-margin_right = 1024.0
-margin_bottom = 572.0
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 right_disconnects = true
-scroll_offset = Vector2( -320, -128 )
-script = ExtResource( 5 )
+script = ExtResource("5")
 hint_path = NodePath("../footer/hint")
 create_path = NodePath("../group/create")
 
-[node name="root" parent="graph" instance=ExtResource( 2 )]
+[node name="root" parent="graph" instance=ExtResource("2")]
+layout_mode = 1
+anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-margin_left = 320.0
-margin_top = -146.0
-margin_right = 380.0
-margin_bottom = -86.0
-mouse_filter = 1
+offset_left = 441.0
+offset_top = -57.0
+offset_right = 510.0
+offset_bottom = 3.0
+grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+mouse_filter = 1
+position_offset = Vector2(441, 232)
 title = "root"
 
 [node name="footer" type="HBoxContainer" parent="."]
-margin_top = 576.0
-margin_right = 1024.0
-margin_bottom = 600.0
+layout_mode = 2
 alignment = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="hint" type="Label" parent="footer"]
-margin_top = 5.0
-margin_right = 364.0
-margin_bottom = 19.0
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 6
 
-[node name="name" type="HBoxContainer" parent="footer"]
-margin_left = 368.0
-margin_right = 676.0
-margin_bottom = 24.0
-
-[node name="Label" type="Label" parent="footer/name"]
-margin_top = 5.0
-margin_right = 42.0
-margin_bottom = 19.0
-text = "Name:"
-
-[node name="name_bar" type="LineEdit" parent="footer/name"]
-margin_left = 46.0
-margin_right = 246.0
-margin_bottom = 24.0
-rect_min_size = Vector2( 200, 0 )
-
-[node name="change_name" type="Button" parent="footer/name"]
-margin_left = 250.0
-margin_right = 308.0
-margin_bottom = 24.0
-text = "Change"
-
 [node name="search" type="HBoxContainer" parent="footer"]
-margin_left = 680.0
-margin_right = 1024.0
-margin_bottom = 24.0
+layout_mode = 2
 
 [node name="Label" type="Label" parent="footer/search"]
-margin_top = 5.0
-margin_right = 92.0
-margin_bottom = 19.0
+layout_mode = 2
 text = "Search Node : "
 
 [node name="search_bar" type="LineEdit" parent="footer/search"]
-margin_left = 96.0
-margin_right = 296.0
-margin_bottom = 24.0
-rect_min_size = Vector2( 200, 0 )
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
 caret_blink = true
-caret_blink_speed = 0.5
+caret_blink_interval = 0.5
 
 [node name="prev" type="Button" parent="footer/search"]
-margin_left = 300.0
-margin_right = 320.0
-margin_bottom = 24.0
-hint_tooltip = "ctrl + shift + LEFT"
+layout_mode = 2
+tooltip_text = "ctrl + shift + LEFT"
 text = "<"
 
 [node name="next" type="Button" parent="footer/search"]
-margin_left = 324.0
-margin_right = 344.0
-margin_bottom = 24.0
-hint_tooltip = "ctrl + shift + RIGHT"
+layout_mode = 2
+tooltip_text = "ctrl + shift + RIGHT"
 text = ">"
 
 [connection signal="pressed" from="group/save" to="graph" method="_on_save_pressed"]
@@ -148,9 +132,6 @@ text = ">"
 [connection signal="gui_input" from="graph" to="graph" method="gui_input"]
 [connection signal="node_selected" from="graph" to="graph" method="node_selected"]
 [connection signal="popup_request" from="graph" to="graph" method="popup_request"]
-[connection signal="text_changed" from="footer/name/name_bar" to="graph" method="_on_name_bar_text_changed"]
-[connection signal="text_entered" from="footer/name/name_bar" to="graph" method="_on_name_bar_text_entered"]
-[connection signal="pressed" from="footer/name/change_name" to="graph" method="_on_change_name_pressed"]
 [connection signal="text_changed" from="footer/search/search_bar" to="graph" method="_on_search_bar_text_changed"]
 [connection signal="pressed" from="footer/search/prev" to="graph" method="_on_prev_pressed"]
 [connection signal="pressed" from="footer/search/next" to="graph" method="_on_next_pressed"]

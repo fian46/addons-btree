@@ -1,9 +1,9 @@
-tool
-extends WindowDialog
+@tool
+extends Window
 
 const rt = preload("res://addons/btree/Runtime/runtime.gd")
 
-func _on_rtree_about_to_show():
+func _on_rtree_about_to_show(): 
 	version = -1
 	var graph = $layout/split/debug_graph
 	clear_editor(graph)
@@ -17,6 +17,8 @@ func _on_rtree_about_to_show():
 var version = -1
 var skip = 0
 func read(msg):
+	if msg == null: #ivo
+		return
 	if  msg.type == 0:
 		var data = msg.payload
 		update_tree(data)
@@ -67,6 +69,7 @@ func update_graph():
 	if  queue.size() == 0:
 		return
 	var msg = queue.pop_front()
+
 	if  version != msg.version:
 		pause = false
 		step = false
@@ -83,7 +86,7 @@ func update_state(data):
 	return
 
 func u_walk(data, graph):
-	var node = node_map[data.name]
+	var node = node_map[data.name] 
 	update_label(node, data.status)
 	if  not data.has("child"):
 		data.child = []
@@ -98,13 +101,13 @@ func update_label(node, status):
 		return
 	node.text = status
 	if  status == "IDLE":
-		node.self_modulate = Color.white
+		node.self_modulate = Color.WHITE
 	elif  status == "RUNNING":
-		node.self_modulate = Color.yellow
+		node.self_modulate = Color.YELLOW
 	elif  status == "SUCCEED":
-		node.self_modulate = Color.green
+		node.self_modulate = Color.GREEN
 	else:
-		node.self_modulate = Color.red
+		node.self_modulate = Color.RED
 	return
 
 var node_map = {}
@@ -119,6 +122,7 @@ func generate_tree(data:Dictionary):
 func walk(data, graph):
 	var node = create_node(data, data.child.size()) as GraphNode
 	node_map[node.name] = node.get_child(0)
+	
 	if  data.has("fn"):
 		var label = Label.new()
 		label.text = str("Function Name : ", data.fn)
@@ -132,7 +136,9 @@ func walk(data, graph):
 			var param = Label.new()
 			param.text = str(i, " : ", dp[i])
 			node.add_child(param)
-	node.offset = data.offset
+
+	node.position_offset = data.offset #ivo 4.2
+	
 	graph.add_child(node)
 	for i in range(data.child.size()):
 		var sel = data.child[i]
@@ -145,25 +151,25 @@ func walk(data, graph):
 var node_scene = preload("res://addons/btree/Editor/root.tscn")
 
 func create_node(data:Dictionary, slot_count:int):
-	var node = node_scene.instance()
+	var node = node_scene.instantiate()
 	node.title = data.name
 	node.name = data.name
 	if  slot_count > 0:
 		for i in range(slot_count):
 			node.add_child(Label.new())
 			if  i == 0 and data.name != "root":
-				node.set_slot(i, true, 0, Color.blue, true, 0, Color.blue)
+				node.set_slot(i, true, 0, Color.BLUE, true, 0, Color.BLUE)
 			else:
-				node.set_slot(i, false, 0, Color.blue, true, 0, Color.blue)
+				node.set_slot(i, false, 0, Color.BLUE, true, 0, Color.BLUE)
 	else:
 		node.add_child(Label.new())
-		node.set_slot(0, true, 0, Color.blue, false, 0, Color.blue)
+		node.set_slot(0, true, 0, Color.BLUE, false, 0, Color.BLUE)
 	node.get_child(0).text = data.status
 	return node
 
 func clear_editor(graph):
 	for i in graph.get_connection_list():
-		graph.disconnect_node(i.from, i.from_port, i.to, i.to_port)
+		graph.disconnect_node(i.from_node, i.from_port, i.to_node, i.to_port) #ivo 4.2
 	for i in graph.get_children():
 		if  i is GraphNode:
 			graph.remove_child(i)
@@ -200,12 +206,20 @@ func write(msg):
 	$client_debugger.write(msg)
 	return
 
-func _on_rtree_popup_hide():
+func _on_rtree_popup_hide(): #ivo отвързах го, защото вече няма такъв метод
 	var msg = {}
 	msg.type = 0
 	msg.visible = false
 	write(msg)
 	return
+	
+#replacement of _on_rtree_popup_hide(): ivo
+func _on_close_requested():
+	var msg = {}
+	msg.type = 0
+	msg.visible = false
+	write(msg)	
+	self.hide()
 
 func _on_rtree_item_selected():
 	update_start_debug_btn()
@@ -258,3 +272,5 @@ func _on_step_button_down():
 func _on_step_button_up():
 	step = false
 	return
+
+

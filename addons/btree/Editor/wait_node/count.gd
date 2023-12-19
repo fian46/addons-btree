@@ -1,3 +1,3 @@
-tool
+@tool
 extends SpinBox
 

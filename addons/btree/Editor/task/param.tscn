@@ -3,8 +3,8 @@
 [ext_resource path="res://addons/btree/Editor/task/param.gd" type="Script" id=1]
 
 [node name="param" type="HBoxContainer"]
-margin_right = 206.0
-margin_bottom = 20.0
+offset_right = 206.0
+offset_bottom = 20.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource( 1 )
@@ -13,21 +13,21 @@ __meta__ = {
 }
 
 [node name="Label" type="Label" parent="."]
-margin_right = 20.0
-margin_bottom = 14.0
+offset_right = 20.0
+offset_bottom = 14.0
 size_flags_vertical = 0
 text = "0 : "
 
 [node name="text_value" type="LineEdit" parent="."]
-margin_left = 24.0
-margin_right = 122.0
-margin_bottom = 24.0
+offset_left = 24.0
+offset_right = 122.0
+offset_bottom = 24.0
 size_flags_horizontal = 3
 
 [node name="OptionButton" type="OptionButton" parent="."]
-margin_left = 126.0
-margin_right = 182.0
-margin_bottom = 20.0
+offset_left = 126.0
+offset_right = 182.0
+offset_bottom = 20.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
 text = "Text"
@@ -35,9 +35,9 @@ items = [ "Number", null, false, 0, null, "Text", null, false, 1, null ]
 selected = 1
 
 [node name="Button" type="Button" parent="."]
-margin_left = 186.0
-margin_right = 206.0
-margin_bottom = 20.0
+offset_left = 186.0
+offset_right = 206.0
+offset_bottom = 20.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
 text = "X"

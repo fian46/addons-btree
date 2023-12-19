@@ -1,7 +1,7 @@
 extends Node
 
 const rt = preload("res://addons/btree/Runtime/runtime.gd")
-var bt_script = load("res://addons/btree/script/btree.gd")
+const bt_script = preload("res://addons/btree/script/btree.gd")
 var server = WebSocketServer.new()
 var objects = []
 var connected_id = -1
@@ -18,11 +18,11 @@ func _ready():
 		print("BT release build")
 		return
 	print("BT debug build")
-	server = WebSocketServer.new()
-	server.listen(7777)
-	server.connect("client_connected", self, "debug_attached")
-	server.connect("client_disconnected", self, "debug_detached")
-	server.connect("data_received", self, "client_data")
+	server = WebSocketServer.new() 
+	server.listen(7777) 
+	server.client_connected.connect(debug_attached) #ivo с NodeWebSockets
+	server.client_disconnected.connect(debug_detached)
+	server.data_received.connect(client_data)
 	print("BT debug server init")
 	return
 
@@ -33,8 +33,14 @@ func _exit_tree():
 			server.poll()
 	return
 
-func client_data(id):
-	var msg = server.get_peer(id).get_var(true)
+func client_data(peer, id, message, is_str): #ivo
+	var msg = message #server.get_peer(id).get_var(true)
+	
+	if msg == null: #ico
+		return
+
+	msg = message.decode_var(0) #ivo
+
 	if  msg.type == 0:
 		send_tree = msg.visible
 		if  not send_tree:
@@ -51,6 +57,7 @@ func client_data(id):
 				selected_instance.debug = null
 			return
 		var new_instance = instance_from_id(msg.instance_id)
+
 		if  selected_instance != new_instance:
 			paused = false
 			step = false
@@ -82,12 +89,14 @@ func hot_reload(id, data):
 	return
 
 func debug_detached(id, was_clean):
+	print("debug_dettached - client disconnect")
 	if  id == connected_id:
 		connected_id = -1
 		send_tree = false
 	return
 
 func debug_attached(id, protocol):
+	print("debug_attached  - client connect")
 	if  connected_id != -1:
 		server.get_peer(connected_id).close()
 		connected_id = -1
@@ -107,8 +116,8 @@ func flush(btree):
 func _process(delta):
 	schedule_cleanup()
 	if  server:
-		if  server.get_connection_status() != 0:
-			while queue.size() > 0 and server.get_connection_status() == 2:
+		if server.client_connected: #ivo 4.1.1 !!!! Това е сигнал Не може да се използва като if
+			while queue.size() > 0: # and server.get_ready_state() == WebSocketPeer.STATE_OPEN: #ivo 4.1.1
 				var front = queue.pop_front()
 				server.get_peer(connected_id).put_var(front, true)
 			server.poll()
@@ -124,7 +133,7 @@ func walk_tree(shift:Vector2, node:Dictionary, result:Dictionary):
 		var shifted = node.data.offset + shift - node.data.data.root.data.offset
 		walk_tree(shifted, node.data.data.root, result)
 	else:
-		result[node.name] = node.data.offset + shift
+		result[node.name] = node.data.offset + shift #orig
 		for i in node.child:
 			walk_tree(shift, i, result)
 	return
@@ -133,8 +142,9 @@ func walk(nd:rt.TNode, offset:Dictionary):
 	if  nd == null:
 		return null
 	var node = {}
-	node.name = nd.get("title")
+	node.name = nd.name 
 	node.offset = offset[nd.name]
+
 	if  nd.get("fn"):
 		node.fn = nd.get("fn")
 		node.dp = nd.get("params")
@@ -202,7 +212,7 @@ func cleanup():
 				tree[btree.name] = btree
 		parent.tree = tree
 		net_data[parent.name] = parent
-	if  send_tree:
+	if  send_tree: 
 		var msg = {}
 		msg.type = 0
 		msg.payload = net_data

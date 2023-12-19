@@ -1,20 +1,20 @@
-tool
+@tool
 extends GraphNode
 
 const Runtime = preload("res://addons/btree/Runtime/runtime.gd")
 const type = Runtime.TNodeTypes.ROOT
 
 func _ready():
-	connect("dragged", get_parent(), "node_dragged", [self])
+	connect("dragged", Callable(get_parent(), "node_dragged").bind(self))
 	return
 
 func get_data():
 	return {
-		"offset" : offset,
-		"size" : rect_size
+		"offset" : position_offset, #ivo
+		"size" : size
 	}
 
 func set_data(data):
-	offset = data.offset
-	rect_size = data.size
+	position_offset = data.offset #ivo
+	size = data.size
 	return

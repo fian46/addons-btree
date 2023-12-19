@@ -1,4 +1,4 @@
-tool
+@tool 
 extends Panel
 
 func halt(value):
@@ -14,5 +14,5 @@ func help():
 	return
 
 func debug():
-	$rtree.popup_centered()
+	$rtree.popup()
 	return

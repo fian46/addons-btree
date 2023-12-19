@@ -1,4 +1,4 @@
-tool
+@tool
 extends HBoxContainer
 
 signal remove_me(me)
@@ -11,8 +11,8 @@ func _ready():
 	$OptionButton.add_item("Text")
 	$OptionButton.selected = 1
 	_on_OptionButton_item_selected(1)
-	$text_value.connect("text_changed", self, "validate")
-	$text_value.connect("focus_exited", self, "fe_validate")
+	$text_value.connect("text_changed", Callable(self, "validate"))
+	$text_value.connect("focus_exited", Callable(self, "fe_validate"))
 	return
 
 func fe_validate():
@@ -31,12 +31,12 @@ func validate(value:String):
 			return
 		var r = float_regex.search(value)
 		if  r:
-			var pc = $text_value.caret_position
+			var pc = $text_value.caret_column
 			$text_value.text = r.get_string()
-			$text_value.caret_position = pc
+			$text_value.caret_column = pc
 		else:
 			$text_value.text = "0"
-			$text_value.caret_position = 1
+			$text_value.caret_column = 1
 	return
 
 func update_label():
@@ -51,7 +51,7 @@ func get_value():
 	var val
 	if  $OptionButton.selected == 0:
 		var text:String = $text_value.text
-		if  text.is_valid_integer():
+		if  text.is_valid_int():
 			val = text.to_int()
 		else:
 			val = text.to_float()

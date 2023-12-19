@@ -1,7 +1,7 @@
-tool
+@tool
 extends EditorPlugin
 
-var btree = load("res://addons/btree/script/btree.gd")
+const btree = preload("res://addons/btree/script/btree.gd") #ivo 4.1.1
 var ibtree = load("res://addons/btree/icons/icon_tree.svg")
 var topi = load("res://addons/btree/icons/icon_tree_top.svg")
 var dock_scene = preload("res://addons/btree/Editor/test.tscn")
@@ -11,12 +11,8 @@ func selection_changed():
 	if  not dock:
 		return
 	var tree_editor = dock.get_node("editor/graph")
-	
-	var selection = get_editor_interface().get_selection().get_selected_nodes()
-	var graph = dock.get_node("editor/graph")
-	if graph:
-		graph._on_save_pressed()
 	tree_editor.clear_editor()
+	var selection = get_editor_interface().get_selection().get_selected_nodes()
 	if  not selection:
 		tree_editor.clear_data()
 		dock.halt("Please select a BTREE node")
@@ -35,7 +31,7 @@ func selection_changed():
 		dock.halt("Please select a BTREE node")
 	return
 
-func make_visible(visible):
+func _make_visible(visible):
 	if  not dock:
 		return
 	if  visible:
@@ -55,46 +51,46 @@ func make_visible(visible):
 		dock.hide()
 	return
 
-func apply_changes():
+func _apply_changes():
 	var graph = dock.get_node("editor/graph")
 	graph._on_save_pressed()
 	return
 
-func get_plugin_icon():
+func _get_plugin_icon():
 	return topi
 
-func has_main_screen():
+func _has_main_screen():
 	return true
 
-func get_plugin_name():
+func _get_plugin_name():
 	return "BTEditor"
 
-func disable_plugin():
+func _disable_plugin():
 	if  not dock:
 		return
-	get_editor_interface().get_editor_viewport().remove_child(dock)
+	get_editor_interface().get_editor_main_screen().remove_child(dock)
 	dock.queue_free()
 	dock = null
 	return
 
 func _enter_tree():
-	dock = dock_scene.instance()
+	dock = dock_scene.instantiate()
 	dock.halt("Please select a BTREE node")
 	add_custom_type("BTREE", "Node", btree, ibtree)
-	get_editor_interface().get_editor_viewport().add_child(dock)
-	get_editor_interface().get_selection().connect("selection_changed",self,"selection_changed");
+	get_editor_interface().get_editor_main_screen().add_child(dock)
+	get_editor_interface().get_selection().connect("selection_changed", Callable(self, "selection_changed"));
 	var ps = ProjectSettings
 	var mbo = "network/limits/websocket_server/max_out_buffer_kb"
 	var mbi = "network/limits/websocket_server/max_in_buffer_kb"
 	ps.set_setting(mbo, 4096)
 	ps.set_setting(mbi, 4096)
 	ps.save()
-	make_visible(false)
+	_make_visible(false)
 	add_autoload_singleton("BTDebugServer", "res://addons/btree/script/bt_debug_server.gd")
-	get_tree().connect("node_added", self, "nodes")
-	get_tree().connect("node_renamed", self, "nodes")
+	get_tree().connect("node_added", Callable(self, "nodes"))
+	get_tree().connect("node_renamed", Callable(self, "nodes"))
 	get_undo_redo().clear_history()
-	get_editor_interface().get_resource_filesystem().connect("resources_reload", self, "fs_reload")
+	get_editor_interface().get_resource_filesystem().connect("resources_reload", Callable(self, "fs_reload"))
 	return
 
 func fs_reload(names):
@@ -111,11 +107,11 @@ func fs_reload(names):
 func nodes(node):
 	if  node is btree:
 		var cn:Node = node
-		while cn != null && (cn.filename == "" || cn.filename == null):
+		while cn != null && (cn.scene_file_path == "" || cn.scene_file_path == null): #ivo 4.1.1
 			cn = cn.get_parent()
 		if  cn:
 			var path = cn.get_path_to(node)
-			node._tree_id = str(hash(cn.filename)) + str(hash(str(path)))
+			node._tree_id = str(hash(cn.scene_file_path)) + str(hash(str(path))) #ivo 4.1.1
 	return
 
 func _exit_tree():
@@ -125,12 +121,12 @@ func _exit_tree():
 	ps.set_setting(mbo, ps.property_get_revert(mbo))
 	ps.set_setting(mbi, ps.property_get_revert(mbi))
 	ps.save()
-	get_tree().disconnect("node_added",self, "nodes")
-	get_tree().disconnect("node_renamed", self, "nodes")
+	get_tree().disconnect("node_added", Callable(self, "nodes"))
+	get_tree().disconnect("node_renamed", Callable(self, "nodes"))
 	remove_custom_type("BTREE")
 	remove_autoload_singleton("BTDebugServer")
-	get_editor_interface().get_resource_filesystem().disconnect("resources_reload", self, "fs_reload")
-	get_undo_redo().clear_history()
+	get_editor_interface().get_resource_filesystem().disconnect("resources_reload", Callable(self, "fs_reload"))
+	get_undo_redo().clear_history() 
 	if  not dock:
 		return
 	dock.queue_free()

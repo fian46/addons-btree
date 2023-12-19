@@ -1,8 +1,8 @@
 [gd_scene format=2]
 
 [node name="root" type="GraphNode"]
-margin_right = 76.0
-margin_bottom = 62.0
+offset_right = 76.0
+offset_bottom = 62.0
 title = "root"
 __meta__ = {
 "_edit_use_anchors_": false
